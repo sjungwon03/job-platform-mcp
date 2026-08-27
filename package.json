@@ -7,7 +7,8 @@
     "build": "pnpm --recursive --if-present run build",
     "lint": "pnpm --recursive --if-present run lint",
     "typecheck": "pnpm --recursive --if-present run typecheck",
-    "test": "pnpm --recursive --if-present run test",
+    "test": "pnpm run test:skill && pnpm --recursive --if-present run test",
+    "test:skill": "node --test skills/job-match-search/test/*.test.mjs",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   }
 }

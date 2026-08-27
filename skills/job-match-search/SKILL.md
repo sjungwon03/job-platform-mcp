@@ -1,11 +1,25 @@
 ---
 name: job-match-search
-description: Analyze a user's resume, CV, career history, or portfolio and search available job-board MCP tools for matching roles. Use when the user asks for personalized 채용공고 검색, job recommendations, role matching, or a fit-gap comparison based on their experience and preferences.
+description: Analyze a user's resume, CV, career history, or portfolio, guide first-time job-board credential setup, and search available MCP tools for matching roles. Use for personalized 채용공고 검색, initial job MCP setup, job recommendations, role matching, or fit-gap comparisons.
 ---
 
 # Job Match Search
 
 사용자가 제공한 경력 자료를 검색 가능한 프로필로 바꾸고, 연결된 채용 MCP에서 공고를 찾아 설명 가능한 적합도 순으로 제시한다.
+
+## 초기 연결
+
+첫 사용, 사용자가 초기 설정을 요청한 경우, 채용 MCP 도구가 하나도 보이지 않는 경우, 인증·설정 오류가 발생한 경우에는 검색 전에 [Credential setup](references/credential-setup.md)을 읽는다.
+
+1. Wanted, 사람인, 잡코리아 중 연결할 플랫폼을 묻고 복수 선택과 건너뛰기를 허용한다.
+2. 선택한 플랫폼의 인증정보가 이미 발급되었는지 확인한다.
+3. 터미널 실행 권한이 있으면 scripts/configure-credentials.mjs를 실행한다. 이 스크립트가 마스킹된 TTY 입력을 받아 저장소 밖의 권한 제한 파일에 저장한다.
+4. 터미널 실행 권한이 없으면 사용 중인 에이전트의 보안 입력 UI, secret store 또는 로컬 MCP 환경변수를 안내한다. 비밀값 자체를 일반 대화로 요구하지 않는다.
+5. MCP 호스트에는 비밀값 대신 scripts/run-mcp.mjs를 서버별 인자와 함께 등록한다.
+6. 사용자가 설정 완료를 알리면 가장 작은 읽기 전용 조회로 연결을 검증한다. 성공 시 플랫폼 이름만 확인하고 인증값은 출력하지 않는다.
+7. 실패하면 누락되거나 거부된 환경변수 이름과 해결 방법만 설명한다. 입력값, 잡코리아 발급 URL 또는 Authorization 헤더를 되풀이하지 않는다.
+
+이미 정상 호출되는 플랫폼에는 매번 인증을 다시 묻지 않는다. 일부 플랫폼을 건너뛰거나 아직 발급받지 못했어도 연결된 플랫폼만으로 계속 검색할 수 있다.
 
 ## 입력 취급
 

@@ -40,6 +40,7 @@ pnpm --filter jobkorea-mcp test
 - Codex, Claude Code, OpenCode, OpenClaw 등 특정 에이전트의 전용 메타데이터에 의존하지 않습니다.
 - 각 클라이언트가 지원하는 workspace skill 경로에 skills/job-match-search 디렉터리를 연결하거나 복사해서 사용합니다.
 - 이력서 원문과 개인정보는 채용 API에 전달하지 않고 파생된 검색 조건만 사용합니다.
+- 최초 사용 시 연결할 채용 플랫폼과 인증 발급 여부를 확인하고 안전한 로컬 입력 방법을 안내합니다.
 
 ~~~text
 내 이력서와 포트폴리오를 분석해서 $job-match-search로 적합한 백엔드 채용공고를 찾아줘.
