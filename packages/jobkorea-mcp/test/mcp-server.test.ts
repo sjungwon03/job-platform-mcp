@@ -22,11 +22,35 @@ describe("JobKoreaMcpServer", () => {
       client.connect(clientTransport),
     ]);
 
-    await expect(client.listTools()).resolves.toMatchObject({
-      tools: expect.arrayContaining([
+    const tools = (await client.listTools()).tools;
+    expect(tools).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "jobkorea_get_search_options" }),
         expect.objectContaining({ name: "jobkorea_fetch_jobs" }),
         expect.objectContaining({ name: "jobkorea_fetch_entry_jobs" }),
       ]),
+    );
+    expect(
+      tools.find(({ name }) => name === "jobkorea_fetch_jobs"),
+    ).toMatchObject({
+      description: expect.stringContaining("사용자별 가이드"),
+      inputSchema: {
+        properties: {
+          parameters: {
+            description: expect.stringContaining("덮어쓸 수 없음"),
+          },
+        },
+      },
+    });
+    await expect(
+      client.callTool({ name: "jobkorea_get_search_options", arguments: {} }),
+    ).resolves.toMatchObject({
+      content: [
+        {
+          type: "text",
+          text: expect.stringContaining("공통 공개 파라미터 명세가 없으므로"),
+        },
+      ],
     });
     await expect(
       client.callTool({

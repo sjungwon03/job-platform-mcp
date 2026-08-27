@@ -22,11 +22,36 @@ describe("SaraminMcpServer", () => {
       client.connect(clientTransport),
     ]);
 
-    await expect(client.listTools()).resolves.toMatchObject({
-      tools: expect.arrayContaining([
+    const tools = (await client.listTools()).tools;
+    expect(tools).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "saramin_get_search_options" }),
         expect.objectContaining({ name: "saramin_search_jobs" }),
         expect.objectContaining({ name: "saramin_get_job" }),
       ]),
+    );
+    expect(
+      tools.find(({ name }) => name === "saramin_search_jobs"),
+    ).toMatchObject({
+      description: expect.stringContaining("saramin_get_search_options"),
+      inputSchema: {
+        properties: {
+          job_type: { description: expect.stringContaining("1~22") },
+          edu_lv: { description: expect.stringContaining("0~9") },
+          count: { default: 10, maximum: 110 },
+          sort: {
+            default: "pd",
+            description: expect.stringContaining("지원자 수"),
+          },
+        },
+      },
+    });
+    await expect(
+      client.callTool({ name: "saramin_get_search_options", arguments: {} }),
+    ).resolves.toMatchObject({
+      content: [
+        { type: "text", text: expect.stringContaining("전문연구요원") },
+      ],
     });
     await expect(
       client.callTool({

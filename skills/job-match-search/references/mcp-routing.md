@@ -4,12 +4,14 @@
 
 ## Wanted
 
+- wanted_get_search_options: 검색 전 정렬·우대 코드, 경력·태그 제한과 페이지 규칙을 확인한다.
 - wanted_list_jobs: 직군·직무·스킬 태그, 경력 범위, 지역, 정렬과 페이지 조건을 지원한다.
 - 태그 ID를 확인할 수 없으면 임의의 ID를 만들지 않는다. 지역·경력처럼 확실한 조건만 적용하거나 다른 플랫폼의 키워드 검색을 우선한다.
 - years의 값 10은 10년 이상을 뜻한다.
 
 ## 사람인
 
+- saramin_get_search_options: 고용형태·학력·정렬 코드와 공식 코드표 링크를 확인한다.
 - saramin_search_jobs: keywords, 지역·직무·고용 형태 코드, 학력, 날짜, 정렬과 페이지 조건을 지원한다.
 - saramin_get_job: 검색 결과의 사람인 공고 번호로 상세 정보를 조회한다.
 - 코드표를 사용할 수 없으면 코드를 추측하지 않고 keywords를 사용한다.
@@ -17,6 +19,7 @@
 
 ## 잡코리아
 
+- jobkorea_get_search_options: 사용자별 발급 가이드의 파라미터 적용 규칙을 확인한다.
 - jobkorea_fetch_jobs: 신입·경력 채용정보 피드를 조회한다.
 - jobkorea_fetch_entry_jobs: 신입·인턴 공채 피드를 조회한다.
 - parameters에는 잡코리아가 호출 URL과 함께 발급한 가이드에 정의된 조건만 넣는다. 파라미터 이름을 추측하지 않는다.

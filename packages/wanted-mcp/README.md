@@ -2,7 +2,31 @@
 
 [Wanted OpenAPI](https://openapi.wanted.jobs/)를 MCP 도구로 제공하기 위한 TypeScript 프로젝트입니다. [TypeMCP](https://www.npmjs.com/package/@theorvane/type-mcp) 데코레이터를 사용하며, 로컬 MCP 호스트가 stdio 프로세스로 실행하는 구조입니다.
 
-현재 초기 버전에는 Wanted OpenAPI V2의 GET /jobs를 감싼 wanted_list_jobs 도구가 포함되어 있습니다.
+현재 초기 버전에는 Wanted OpenAPI V2의 GET /jobs와 검색 옵션 안내를 제공하는 다음 도구가 포함되어 있습니다.
+
+| 도구 | 설명 |
+| --- | --- |
+| wanted_get_search_options | 정렬·우대 코드, 경력·태그 제한, 페이지 규칙 조회 |
+| wanted_list_jobs | 지원되는 상세 조건으로 포지션 목록 조회 |
+
+## 채용 검색 상세 옵션
+
+| 입력 | 형식·제약 | 의미 |
+| --- | --- | --- |
+| category_tag | 정수 1개 | 직군 태그 ID |
+| subcategory_tags | 정수 배열, 최대 5개 | 직무 태그 ID |
+| skill_tags | 정수 배열, 최대 5개 | 스킬 태그 ID |
+| attraction_tags | 정수 배열, 최대 5개 | 매력 태그 ID |
+| years | 0~10 정수 배열, 최대 2개 | 경력 범위. 10은 10년 이상 |
+| locations | 비어 있지 않은 문자열 배열 | 지역·국가 |
+| additional_apply_types | 아래 고정 코드 배열 | 외국인·병역특례·장애인 우대 |
+| sort | 아래 고정 코드, 기본 latest | 정렬 |
+| offset | 0 이상 정수, 기본 0 | 결과 오프셋 |
+| limit | 양의 정수, 기본 20 | 결과 수. 공식 V2 명세에는 상한 미기재 |
+
+정렬 코드는 `job.latest_order`(최신순), `job.popularity_order`(인기순), `company.response_rate_order`(기업 응답률순)입니다. 우대 코드는 `job.additional_apply_type.foreigner`, `job.additional_apply_type.alternative_military`, `job.additional_apply_type.disabled_person`입니다.
+
+태그 필터에는 이름이 아닌 원티드의 숫자 태그 ID를 전달합니다. 현재 공개 [V2 OpenAPI 명세](https://openapi.wanted.jobs/v2/openapi.json)는 GET /jobs만 노출하므로 이 MCP가 태그 ID를 추측하지 않습니다. 직원 수 필터 역시 소개 페이지에는 언급되지만 현재 GET /jobs 요청 스키마에는 없어 구현하지 않았습니다.
 
 ## 과금과 인증 원칙
 
