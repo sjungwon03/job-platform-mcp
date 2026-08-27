@@ -18,11 +18,11 @@
 
 ## 시작하기
 
-요구 사항은 Node.js 22 이상입니다.
+요구 사항은 Node.js 22 이상과 pnpm입니다. 모노레포 루트에서 실행합니다.
 
 ~~~bash
-npm install
-npm run build
+pnpm install
+pnpm --filter wanted-mcp build
 ~~~
 
 환경변수를 설정합니다.
@@ -38,7 +38,7 @@ WANTED_AUTHORIZATION은 Wanted에서 별도 권한 토큰을 발급한 사용자
 빌드된 stdio 서버를 직접 실행하려면:
 
 ~~~bash
-npm start
+pnpm --filter wanted-mcp start
 ~~~
 
 stdio 서버는 터미널에서 화면을 제공하지 않습니다. 아래처럼 MCP 호스트에 등록해 사용합니다.
@@ -48,7 +48,7 @@ stdio 서버는 터미널에서 화면을 제공하지 않습니다. 아래처�
   "mcpServers": {
     "wanted": {
       "command": "node",
-      "args": ["/absolute/path/to/wanted-mcp/dist/index.js"],
+      "args": ["/absolute/path/to/packages/wanted-mcp/dist/index.js"],
       "env": {
         "WANTED_CLIENT_ID": "your-client-id",
         "WANTED_CLIENT_SECRET": "your-client-secret",
@@ -62,11 +62,11 @@ stdio 서버는 터미널에서 화면을 제공하지 않습니다. 아래처�
 ## 개발
 
 ~~~bash
-npm run dev
-npm run lint
-npm run typecheck
-npm test
-npm run build
+pnpm --filter wanted-mcp dev
+pnpm --filter wanted-mcp lint
+pnpm --filter wanted-mcp typecheck
+pnpm --filter wanted-mcp test
+pnpm --filter wanted-mcp build
 ~~~
 
 ## 구조

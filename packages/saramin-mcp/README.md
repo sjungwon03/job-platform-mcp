@@ -22,11 +22,11 @@
 
 ## 시작하기
 
-Node.js 22 이상이 필요합니다.
+Node.js 22 이상과 pnpm이 필요합니다. 모노레포 루트에서 실행합니다.
 
 ~~~bash
-npm install
-npm run build
+pnpm install
+pnpm --filter saramin-mcp build
 ~~~
 
 MCP 호스트 설정 예시:
@@ -36,7 +36,7 @@ MCP 호스트 설정 예시:
   "mcpServers": {
     "saramin": {
       "command": "node",
-      "args": ["/absolute/path/to/saramin-mcp/dist/index.js"],
+      "args": ["/absolute/path/to/packages/saramin-mcp/dist/index.js"],
       "env": {
         "SARAMIN_ACCESS_KEY": "your-access-key"
       }
@@ -56,11 +56,11 @@ MCP 호스트 설정 예시:
 ## 개발
 
 ~~~bash
-npm run dev
-npm run lint
-npm run typecheck
-npm test
-npm run build
+pnpm --filter saramin-mcp dev
+pnpm --filter saramin-mcp lint
+pnpm --filter saramin-mcp typecheck
+pnpm --filter saramin-mcp test
+pnpm --filter saramin-mcp build
 ~~~
 
 ## 구조

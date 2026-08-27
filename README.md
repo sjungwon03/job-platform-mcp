@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | packages/wanted-mcp | Wanted OpenAPI | [설정 및 도구](packages/wanted-mcp/README.md) |
 | packages/saramin-mcp | 사람인 채용정보 API | [설정 및 도구](packages/saramin-mcp/README.md) |
+| packages/jobkorea-mcp | 잡코리아 채용정보 API | [설정 및 도구](packages/jobkorea-mcp/README.md) |
 
 각 패키지는 별도 stdio 프로세스로 실행되며 인증정보, API 클라이언트, 도구 스키마를 공유하지 않습니다. 루트 workspace는 의존성 설치, 단일 lockfile과 전체 검증만 통합합니다.
 
@@ -24,6 +25,9 @@ pnpm --filter wanted-mcp test
 
 pnpm --filter saramin-mcp build
 pnpm --filter saramin-mcp test
+
+pnpm --filter jobkorea-mcp build
+pnpm --filter jobkorea-mcp test
 ~~~
 
 실행과 MCP 호스트 등록에 필요한 환경변수는 각 패키지 README를 참고하세요. 실제 인증정보는 저장소에 커밋하지 않습니다.
