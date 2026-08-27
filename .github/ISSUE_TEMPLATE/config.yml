@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: API credential exposure
+  - name: API 인증정보 노출 신고
     url: https://github.com/sjungwon03/job-platform-mcp/security/advisories/new
     about: 실제 인증정보가 노출된 보안 문제는 공개 Issue 대신 비공개 보안 권고로 신고해 주세요.

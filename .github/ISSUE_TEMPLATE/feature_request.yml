@@ -1,4 +1,4 @@
-name: Feature request
+name: 기능 제안
 description: 새로운 MCP 도구, 스킬 동작 또는 개발 개선을 제안합니다.
 title: "feat: "
 labels:
@@ -13,9 +13,9 @@ body:
         - saramin-mcp
         - jobkorea-mcp
         - job-match-search skill
-        - developer experience
-        - documentation
-        - new package
+        - 개발 경험
+        - 문서
+        - 새 패키지
     validations:
       required: true
 
