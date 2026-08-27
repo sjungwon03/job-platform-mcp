@@ -1,0 +1,60 @@
+name: Feature request
+description: 새로운 MCP 도구, 스킬 동작 또는 개발 개선을 제안합니다.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: 대상
+      options:
+        - wanted-mcp
+        - saramin-mcp
+        - jobkorea-mcp
+        - job-match-search skill
+        - developer experience
+        - documentation
+        - new package
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 해결하려는 문제
+      description: 구현 방법보다 사용자 문제를 먼저 설명해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안
+      description: 원하는 동작과 입력·출력 예시를 작성해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 조건
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: 공식 API 근거
+      description: 관련 공식 문서와 필요한 권한·과금 정보를 적어 주세요.
+
+  - type: textarea
+    id: security
+    attributes:
+      label: 보안과 개인정보 영향
+      description: 새 인증정보, 외부 전송, 이력서 데이터 또는 결제가 관련되는지 적어 주세요.
+    validations:
+      required: true
