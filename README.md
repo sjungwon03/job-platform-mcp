@@ -31,3 +31,16 @@ pnpm --filter jobkorea-mcp test
 ~~~
 
 실행과 MCP 호스트 등록에 필요한 환경변수는 각 패키지 README를 참고하세요. 실제 인증정보는 저장소에 커밋하지 않습니다.
+
+## 채용 매칭 스킬
+
+[job-match-search](skills/job-match-search/SKILL.md)는 사용자가 제공한 이력서·CV·포트폴리오에서 검색 조건을 만들고, 사용 가능한 채용 MCP를 함께 조회해 근거 기반 적합도 순으로 정리합니다.
+
+- 공개 Agent Skills의 SKILL.md 형식만 사용합니다.
+- Codex, Claude Code, OpenCode, OpenClaw 등 특정 에이전트의 전용 메타데이터에 의존하지 않습니다.
+- 각 클라이언트가 지원하는 workspace skill 경로에 skills/job-match-search 디렉터리를 연결하거나 복사해서 사용합니다.
+- 이력서 원문과 개인정보는 채용 API에 전달하지 않고 파생된 검색 조건만 사용합니다.
+
+~~~text
+내 이력서와 포트폴리오를 분석해서 $job-match-search로 적합한 백엔드 채용공고를 찾아줘.
+~~~
