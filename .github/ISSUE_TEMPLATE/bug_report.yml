@@ -1,0 +1,80 @@
+name: 버그 신고
+description: 재현 가능한 MCP, 스킬 또는 개발 도구 문제를 보고합니다.
+title: "fix: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        실제 인증정보, 이력서 개인정보, 잡코리아 발급 URL을 입력하지 마세요.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 영향 범위
+      options:
+        - wanted-mcp
+        - saramin-mcp
+        - jobkorea-mcp
+        - job-match-search skill
+        - 인증 설정
+        - CI 또는 저장소 도구
+        - 여러 영역
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 문제 설명
+      description: 무엇이 잘못되었는지 간결하게 설명해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1. 실행한 명령 또는 MCP 도구
+        2. 비밀값을 제거한 입력
+        3. 발생한 결과
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 환경
+      placeholder: |
+        OS:
+        Node:
+        pnpm:
+        MCP host:
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 정리된 로그
+      description: 인증정보와 개인정보를 제거한 로그만 첨부해 주세요.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 확인
+      options:
+        - label: 동일한 Issue가 없는지 검색했습니다.
+          required: true
+        - label: 실제 API 키, 토큰, 발급 URL과 개인정보를 제거했습니다.
+          required: true

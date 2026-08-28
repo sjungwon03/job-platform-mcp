@@ -1,0 +1,7 @@
+# Default owner for all changes.
+* @sjungwon03
+
+# Security-sensitive credential and workflow code.
+/skills/job-match-search/scripts/ @sjungwon03
+/.github/workflows/ @sjungwon03
+/.github/CODEOWNERS @sjungwon03
