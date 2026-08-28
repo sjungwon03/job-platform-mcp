@@ -23,7 +23,7 @@ https://www.jobkorea.co.kr/Search/에서 공개 검색을 한 번 실행합니�
 | limit | 1~20, 기본값 10 |
 | acknowledgePersonalUse | true만 허용 |
 
-검색 조건은 공식 검색창에 넣을 자연어로 조합됩니다. 열린 브라우저에서 사용자가 공식 필터 UI를 추가로 조정할 수 있습니다. 이력서 원문이나 개인정보를 입력하지 마세요.
+검색어에는 query와 includeKeywords만 넣습니다. experience는 겹치는 공개 경력 구간, employmentTypes는 공개 체크박스로 적용합니다. 지역은 전체 체크 상태를 안정적으로 확인할 수 없어 적용하지 않으며, 근무방식과 함께 filters.skipped로 반환합니다. 이력서 원문이나 개인정보를 입력하지 마세요.
 
 ## 화면 추출
 

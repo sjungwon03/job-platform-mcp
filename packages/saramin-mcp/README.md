@@ -23,7 +23,7 @@ https://www.saramin.co.kr/zf_user/search/recruit에서 공개 검색을 한 번 
 | limit | 1~20, 기본값 10 |
 | acknowledgePersonalUse | true만 허용 |
 
-검색 조건은 공식 검색창에 넣을 자연어로 조합됩니다. 열린 브라우저에서 사용자가 공식 필터 UI를 추가로 조정할 수 있습니다. 이력서 원문이나 개인정보를 입력하지 마세요.
+검색어에는 query와 includeKeywords만 넣습니다. locations는 공개 지역 패널의 시·도 전체, experience.minYears는 공개 경력 하한, employmentTypes는 상세조건 체크박스로 적용합니다. 원격은 재택근무 가능으로 적용하며 최대 연차·출근·하이브리드는 미적용 이유를 filters.skipped로 반환합니다. 이력서 원문이나 개인정보를 입력하지 마세요.
 
 ## 화면 추출
 

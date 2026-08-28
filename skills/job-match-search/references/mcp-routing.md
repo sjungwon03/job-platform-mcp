@@ -24,6 +24,13 @@
 
 query, locations, experience, employmentTypes, workModes, includeKeywords, excludeKeywords, limit과 acknowledgePersonalUse를 지원합니다. 상세 제한은 get_search_options로 확인합니다.
 
+## 공개 필터 지원
+
+- Wanted: 지역만 적용합니다. 경력·고용형태·근무방식은 미적용 사유를 반환합니다.
+- 사람인: 지역, 최소 경력, 고용형태와 원격을 적용합니다.
+- 잡코리아: 경력 구간과 고용형태를 적용합니다. 지역은 전체 체크 상태가 불안정해 미적용으로 반환합니다.
+- 조건을 적용하지 못해도 검색어에 합쳐 우회하지 않습니다. search_jobs의 filters.applied와 filters.skipped를 반드시 확인합니다.
+
 ## 호출 전략
 
 1. 첫 검색 전에 개인·비상업용 목적과 책임 고지 수락을 확인합니다.

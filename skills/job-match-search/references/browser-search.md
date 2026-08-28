@@ -16,7 +16,7 @@
 1. get_search_options로 현재 스키마를 확인합니다.
 2. 직무명, 대표 기술, 지역과 확실한 선호만 전달합니다.
 3. acknowledgePersonalUse를 true로 설정하고 search_jobs를 한 번 호출합니다.
-4. 열린 브라우저 화면과 반환된 provider, searchUrl, resultCount, results를 확인합니다.
+4. 열린 브라우저 화면과 반환된 provider, searchUrl, filters.applied, filters.skipped, resultCount와 results를 확인합니다. 미적용 조건은 추천의 미확인 범위에 명시합니다.
 5. 플랫폼당 최대 20건을 넘지 않고 중복을 제거합니다.
 6. 결과가 부족하면 사용자에게 검색어 조정 여부를 묻습니다. 다음 페이지를 자동 이동하지 않습니다.
 7. CAPTCHA, 로그인, 비정상 접근, 403·429 또는 차단 안내가 나타나면 즉시 중단합니다.
