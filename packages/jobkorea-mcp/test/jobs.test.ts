@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildSearchUrl, searchJobsInputSchema } from "../src/tools/jobs.js";
+import {
+  buildFilterPlan,
+  buildSearchUrl,
+  searchJobsInputSchema,
+} from "../src/tools/jobs.js";
 
 describe("잡코리아 browser job search", () => {
   it("builds an official search URL from derived conditions", () => {
@@ -17,8 +21,16 @@ describe("잡코리아 browser job search", () => {
     expect(url.origin + url.pathname).toBe(
       "https://www.jobkorea.co.kr/Search/",
     );
-    expect(url.searchParams.get("stext")).toContain("백엔드 서울 경기");
-    expect(url.searchParams.get("stext")).toContain("경력 2-4년");
+    expect(url.searchParams.get("stext")).toBe("백엔드 Spring Boot");
+    expect(buildFilterPlan(input)).toEqual({
+      careerBuckets: ["1~3년", "4~6년"],
+      employmentTypes: ["정규직"],
+      skipped: [
+        "지역 서울: 잡코리아 전체 체크 상태를 안정적으로 확인하지 못해 미적용",
+        "지역 경기: 잡코리아 전체 체크 상태를 안정적으로 확인하지 못해 미적용",
+        "근무방식 하이브리드: 잡코리아 공개 검색 화면에서 지원하지 않아 미적용",
+      ],
+    });
   });
 
   it("rejects invalid ranges and more than 20 visible results", () => {

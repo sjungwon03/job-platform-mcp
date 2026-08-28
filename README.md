@@ -149,7 +149,13 @@ jobkorea_search_jobs
 | limit | 아니요 | 1~20, 기본 10 | 현재 화면에서 반환할 최대 공고 |
 | acknowledgePersonalUse | 예 | true만 허용 | 개인·비상업용 단일 검색과 잔여 위험 확인 |
 
-플랫폼의 불안정한 내부 코드나 비공개 엔드포인트를 사용하지 않기 위해 지역·경력·고용형태·근무방식은 공식 검색창에 넣을 자연어 검색어로 조합합니다. 사용자는 열린 화면의 공식 필터 UI에서 조건을 더 조정할 수 있습니다.
+query와 includeKeywords만 공식 검색어에 넣습니다. 나머지 조건은 다음 공개 필터 UI에서 적용하며, 지원하지 않거나 화면 변경으로 적용하지 못한 조건은 결과의 filters.skipped에 표시합니다. 미적용 조건을 검색어에 몰래 합치지 않습니다.
+
+| 플랫폼 | 지역 | 경력 | 고용형태 | 근무방식 |
+| --- | --- | --- | --- | --- |
+| Wanted | 공개 지역 팝업의 복수 지역 | 미적용: 접근 가능한 슬라이더 없음 | 미지원 | 미지원 |
+| 사람인 | 시·도 전체 | 최소 연차, 최대 연차는 미적용 | 지원 | 원격만 재택근무 가능으로 적용 |
+| 잡코리아 | 미적용: 전체 체크 렌더링 불안정 | 겹치는 공개 경력 구간으로 근사 | 지원 | 미지원 |
 
 예시:
 
@@ -229,7 +235,7 @@ ln -s ../../skills/job-match-search .opencode/skills/job-match-search
 
 ## 결과 형식
 
-각 search_jobs 도구는 provider, mode, searchUrl, resultCount, results와 notice를 반환합니다. results에는 title, url, 현재 카드 주변의 최대 600자 summary가 포함됩니다. 이 문맥은 전체 공고나 정확한 자격요건을 대신하지 않으므로 추천 후보는 원문 화면에서 다시 확인해야 합니다.
+각 search_jobs 도구는 provider, mode, searchUrl, resultCount, results, filters와 notice를 반환합니다. filters.applied는 실제 공개 UI에 적용된 조건, filters.skipped는 지원하지 않거나 화면에서 찾지 못한 조건입니다. results에는 title, url, 현재 카드 주변의 최대 600자 summary가 포함됩니다. 이 문맥은 전체 공고나 정확한 자격요건을 대신하지 않으므로 추천 후보는 원문 화면에서 다시 확인해야 합니다.
 
 ## 개발
 

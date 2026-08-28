@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildSearchUrl, searchJobsInputSchema } from "../src/tools/jobs.js";
+import {
+  buildFilterPlan,
+  buildSearchUrl,
+  searchJobsInputSchema,
+} from "../src/tools/jobs.js";
 
 describe("원티드 browser job search", () => {
   it("builds an official search URL from derived conditions", () => {
@@ -15,9 +19,16 @@ describe("원티드 browser job search", () => {
     const url = buildSearchUrl(input);
 
     expect(url.origin + url.pathname).toBe("https://www.wanted.co.kr/search");
-    expect(url.searchParams.get("query")).toContain("백엔드 서울 경기");
-    expect(url.searchParams.get("query")).toContain("경력 2-4년");
+    expect(url.searchParams.get("query")).toBe("백엔드 Spring Boot");
     expect(url.searchParams.get("tab")).toBe("position");
+    expect(buildFilterPlan(input)).toEqual({
+      locations: ["서울", "경기"],
+      skipped: [
+        "경력: 접근 가능한 공개 슬라이더 컨트롤이 없어 미적용",
+        "고용형태: Wanted 공개 검색 화면에서 지원하지 않아 미적용",
+        "근무방식: Wanted 공개 검색 화면에서 지원하지 않아 미적용",
+      ],
+    });
   });
 
   it("rejects invalid ranges and more than 20 visible results", () => {

@@ -37,8 +37,16 @@ export interface BrowserSearchResult {
   readonly searchUrl: string;
   readonly resultCount: number;
   readonly results: readonly VisibleJob[];
+  readonly filters: BrowserFilterReport;
   readonly notice: string;
 }
+
+export interface BrowserFilterReport {
+  readonly applied: readonly string[];
+  readonly skipped: readonly string[];
+}
+
+export type VisibleFilterApplier = (page: Page) => Promise<BrowserFilterReport>;
 
 function positiveInteger(
   raw: string | undefined,
@@ -137,7 +145,10 @@ export const browserSearchInputSchema = z.object({
 export type GetSearchOptionsInput = z.infer<typeof getSearchOptionsInputSchema>;
 export type BrowserSearchInput = z.infer<typeof browserSearchInputSchema>;
 
-export function getBrowserSearchOptions(provider: string) {
+export function getBrowserSearchOptions(
+  provider: string,
+  filterUi: Readonly<Record<string, string>>,
+) {
   return {
     provider,
     mode: "visible-browser",
@@ -153,28 +164,14 @@ export function getBrowserSearchOptions(provider: string) {
       limit: "1~20, 기본값 10",
       acknowledgePersonalUse: "반드시 true",
     },
+    filterUi,
     boundary:
       "사용자에게 보이는 현재 검색 화면만 읽으며 로그인·CAPTCHA·접근 제한을 우회하거나 페이지를 자동 순회하지 않음",
   } as const;
 }
 
 export function buildSearchTerms(input: BrowserSearchInput): string {
-  const terms = [
-    input.query,
-    ...input.locations,
-    ...input.includeKeywords,
-    ...input.employmentTypes,
-    ...input.workModes,
-  ];
-  if (
-    input.experience?.minYears !== undefined ||
-    input.experience?.maxYears !== undefined
-  ) {
-    terms.push(
-      `경력 ${input.experience.minYears ?? 0}-${input.experience.maxYears ?? "이상"}년`,
-    );
-  }
-  return terms.join(" ");
+  return [input.query, ...input.includeKeywords].join(" ");
 }
 
 export class VisibleBrowserCrawler {
@@ -191,6 +188,7 @@ export class VisibleBrowserCrawler {
     searchUrl: URL,
     limit: number,
     excluded: readonly string[],
+    applyFilters?: VisibleFilterApplier,
   ): Promise<BrowserSearchResult> {
     this.assertAllowed(searchUrl);
     const page = await this.getPage();
@@ -201,15 +199,17 @@ export class VisibleBrowserCrawler {
     });
     await page.waitForTimeout(this.config.settleMs);
 
+    await this.assertNotBlocked(page);
+    const filters = applyFilters
+      ? await applyFilters(page)
+      : { applied: [], skipped: [] };
+    if (filters.applied.length > 0) {
+      await page.waitForTimeout(this.config.settleMs);
+    }
+
     const finalUrl = new URL(page.url());
     this.assertAllowed(finalUrl);
-
-    const bodyText = await page.locator("body").innerText({ timeout: 5_000 });
-    if (BLOCKED_TEXT.test(bodyText)) {
-      throw new Error(
-        `${this.policy.provider} displayed an access restriction or CAPTCHA; automation stopped`,
-      );
-    }
+    await this.assertNotBlocked(page);
 
     const candidates = await page
       .locator(this.policy.linkSelector)
@@ -285,9 +285,19 @@ export class VisibleBrowserCrawler {
       searchUrl: finalUrl.toString(),
       resultCount: results.length,
       results,
+      filters,
       notice:
         "현재 브라우저 화면의 공개 공고만 읽었습니다. 원문·HTML·쿠키는 저장하지 않았습니다.",
     };
+  }
+
+  private async assertNotBlocked(page: Page): Promise<void> {
+    const bodyText = await page.locator("body").innerText({ timeout: 5_000 });
+    if (BLOCKED_TEXT.test(bodyText)) {
+      throw new Error(
+        `${this.policy.provider} displayed an access restriction or CAPTCHA; automation stopped`,
+      );
+    }
   }
 
   private assertAllowed(url: URL): void {
