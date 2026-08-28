@@ -1,47 +1,54 @@
-# Job Platform MCP Monorepo
+# Job Platform Browser MCP Monorepo
 
-Wanted, 사람인, 잡코리아 채용 API를 각각 독립된 MCP 서버로 제공하고, 이력서·포트폴리오를 바탕으로 맞춤 채용공고를 찾는 Agent Skill을 함께 제공하는 TypeScript 모노레포입니다.
+Wanted, 사람인, 잡코리아의 공개 채용 검색 화면을 사용자가 볼 수 있는 브라우저에서 열고, 현재 화면에 표시된 공고를 제한적으로 읽는 TypeMCP 서버 모노레포입니다. 이력서·포트폴리오를 검색 조건으로 축약하고 결과를 비교하는 이식 가능한 Agent Skill도 함께 제공합니다.
 
-이 문서는 사람이 직접 설정할 때와 Codex, Claude Code, OpenCode, OpenClaw 같은 에이전트가 대신 설정할 때 모두 사용할 수 있는 기준 문서입니다.
+이 문서는 사람과 Codex, Claude Code, OpenCode, OpenClaw 같은 코딩 에이전트가 동일하게 설정할 수 있는 기준 문서입니다.
 
-## 제공 기능
+> 이 프로젝트는 개인 구직자를 위한 실험적 브라우저 자동화 도구입니다. 플랫폼의 허가, 법률 자문 또는 약관 준수 보증을 제공하지 않습니다. 사용 전 [준수 및 책임 안내](COMPLIANCE.md)를 읽고 각 플랫폼의 최신 약관을 직접 확인하세요.
 
-| 패키지 | 플랫폼 | MCP 도구 | 인증 방식 |
-| --- | --- | --- | --- |
-| [wanted-mcp](packages/wanted-mcp/README.md) | Wanted OpenAPI | wanted_get_search_options, wanted_list_jobs | 사용자 Client ID와 Client Secret |
-| [saramin-mcp](packages/saramin-mcp/README.md) | 사람인 채용정보 API | saramin_get_search_options, saramin_search_jobs, saramin_get_job | 사용자 access-key |
-| [jobkorea-mcp](packages/jobkorea-mcp/README.md) | 잡코리아 채용정보 API | jobkorea_get_search_options, jobkorea_fetch_jobs, jobkorea_fetch_entry_jobs | 승인 후 발급된 사용자별 호출 URL |
+## 무엇이 달라졌나
 
-[job-match-search](skills/job-match-search/SKILL.md) 스킬은 다음 작업을 수행합니다.
+이 저장소의 세 MCP는 채용 플랫폼 API를 호출하지 않습니다.
 
-- 사용자가 제공한 이력서, CV, 경력기술서, 포트폴리오 분석
-- 목표 직무, 경력, 기술, 도메인과 선호 조건 추출
-- 지역이나 상세 조건이 없으면 검색 전에 한 번에 질문
-- 사용자가 조건 입력을 건너뛰면 지역·근무 형태 제한 없이 검색
-- 연결된 Wanted, 사람인, 잡코리아 MCP를 함께 조회
-- 중복 공고 제거와 근거 기반 적합도 평가
-- 상위 공고의 일치 근거, 부족한 요건과 원문 링크 제공
+- API 키, Client ID, Client Secret, access-key 또는 발급 URL이 필요하지 않습니다.
+- 사용자가 볼 수 있는 별도 브라우저 창에서 공식 공개 검색 페이지를 엽니다.
+- 현재 화면에 렌더링되어 실제로 표시되는 공고 링크만 최대 20건 읽습니다.
+- 검색 결과 원문, HTML, 쿠키와 세션을 파일이나 데이터베이스에 저장하지 않습니다.
+- 다음 페이지 자동 순회, 예약 수집, 병렬 대량 수집과 숨겨진 네트워크 요청 복제를 하지 않습니다.
+- CAPTCHA, 로그인, robots.txt, 403·429, IP 차단 또는 그 밖의 접근 제한을 우회하지 않습니다.
 
-## 설계 원칙
+## 구성
 
-- 세 MCP는 별도 stdio 프로세스로 실행됩니다.
-- TypeMCP 0.4.0과 분리형 MCP SDK v2 런타임을 사용합니다.
-- stdio 서버는 factory 방식으로 시작해 MCP 2025·2026 프로토콜을 협상합니다.
-- 플랫폼별 인증정보와 API 클라이언트를 서로 공유하지 않습니다.
-- 각 사용자가 직접 발급받은 API 권한을 사용합니다.
-- 유료 기능은 사용자의 계정에 권한이 있을 때만 호출됩니다.
-- 이력서 원문과 개인정보를 채용 API에 전송하지 않습니다.
-- 검색에 필요한 직무명, 기술, 경력, 지역 같은 최소 파생 조건만 API로 전달합니다.
-- 사용자의 확인 없이 지원서 제출, 계정 생성, 담당자 연락 또는 결제를 수행하지 않습니다.
+| 패키지 | 대상 화면 | MCP 도구 |
+| --- | --- | --- |
+| [wanted-mcp](packages/wanted-mcp/README.md) | Wanted 공개 포지션 검색 | wanted_get_search_options, wanted_search_jobs |
+| [saramin-mcp](packages/saramin-mcp/README.md) | 사람인 공개 채용 검색 | saramin_get_search_options, saramin_search_jobs |
+| [jobkorea-mcp](packages/jobkorea-mcp/README.md) | 잡코리아 공개 통합 검색 | jobkorea_get_search_options, jobkorea_search_jobs |
+| browser-search-core | 화면 표시형 Chromium 실행, 허용 호스트 검사, 현재 화면 추출과 공통 입력 검증 | 내부 공용 패키지 |
+| [job-match-search](skills/job-match-search/SKILL.md) | 이력서 기반 검색어 생성, 세 MCP 라우팅, 중복 제거와 적합도 평가 | 이식 가능한 Agent Skill |
+
+각 MCP는 독립된 stdio 프로세스입니다. 공통 브라우저 계층만 공유하고 검색 URL과 공고 링크 판별 규칙은 플랫폼 패키지에 둡니다.
+
+## 작동 방식
+
+~~~text
+이력서/포트폴리오
+  → 직무·기술·경력·지역만 파생
+  → 개인·비상업용 및 위험 고지 확인
+  → 플랫폼별 화면 표시형 브라우저 검색
+  → 현재 화면의 최대 20개 공개 링크
+  → 중복 제거·적합도 비교
+~~~
+
+브라우저는 기본적으로 설치된 Google Chrome을 새로운 비영구 컨텍스트로 엽니다. MCP 프로세스마다 탭 하나를 재사용하며 프로세스가 끝나면 컨텍스트도 끝납니다. 개인 브라우저 프로필, 저장된 비밀번호나 기존 쿠키에 연결하지 않습니다.
 
 ## 요구 사항
 
 - Node.js 22 이상
 - pnpm 11 이상
 - Git
-- 사용할 채용 플랫폼의 API 인증정보
-
-버전을 확인합니다.
+- Google Chrome 또는 Playwright Core가 실행할 수 있는 Chromium 계열 브라우저
+- 데스크톱 화면 세션. 서버 전용 headless 환경은 지원 대상이 아닙니다.
 
 ~~~bash
 node --version
@@ -49,123 +56,40 @@ pnpm --version
 git --version
 ~~~
 
-## 빠른 시작
+## 설치와 빌드
 
-### 1. 저장소 받기
+저장소 루트에서 실행합니다.
 
 ~~~bash
 git clone https://github.com/sjungwon03/job-platform-mcp.git
 cd job-platform-mcp
-~~~
-
-아직 원격 저장소를 받기 전 로컬 작업 중이라면 현재 저장소 루트에서 다음 단계부터 진행합니다.
-
-### 2. 의존성 설치와 빌드
-
-~~~bash
-pnpm install
+pnpm install --frozen-lockfile
 pnpm build
-~~~
-
-전체 상태를 검증하려면:
-
-~~~bash
 pnpm verify
 ~~~
 
-검증에는 lint, TypeScript 타입 검사, 보안 저장소 테스트, MCP 테스트와 프로덕션 빌드가 포함됩니다.
-
-### 3. API 인증정보 준비
-
-원하는 플랫폼만 설정하면 됩니다. 세 플랫폼을 모두 사용할 필요는 없습니다.
-
-#### Wanted
-
-발급: https://openapi.wanted.jobs/apply/
-
-| 환경변수 | 필수 | 설명 |
-| --- | --- | --- |
-| WANTED_CLIENT_ID | 예 | 사용자가 발급받은 Client ID |
-| WANTED_CLIENT_SECRET | 예 | 사용자가 발급받은 Client Secret |
-| WANTED_AUTHORIZATION | 아니요 | 별도 권한 또는 유료 기능에 필요한 Authorization 값 |
-
-이 프로젝트는 API 비용을 대신 결제하거나 공용 키를 제공하지 않습니다. 유료 기능을 사용할 경우 해당 MCP 사용자가 자신의 Wanted 계정으로 권한과 결제를 관리합니다.
-
-#### 사람인
-
-발급: https://oapi.saramin.co.kr/
-
-| 환경변수 | 필수 | 설명 |
-| --- | --- | --- |
-| SARAMIN_ACCESS_KEY | 예 | 사용자가 발급받은 access-key |
-
-#### 잡코리아
-
-안내: https://www.jobkorea.co.kr/service/api
-
-잡코리아는 이용 승인과 요청 IP 등록 후 고유 호출 URL을 제공합니다.
-
-| 환경변수 | 필수 | 설명 |
-| --- | --- | --- |
-| JOBKOREA_JOBS_API_URL | 조건부 | 일반 채용정보용 발급 URL |
-| JOBKOREA_ENTRY_API_URL | 조건부 | 신입·인턴 공채용 발급 URL |
-
-두 URL 중 하나 이상이 필요합니다. 발급 URL 전체를 비밀정보로 취급해야 합니다.
-
-### 4. 인증정보 안전하게 입력
-
-인증정보를 채팅, README, Git 추적 파일 또는 MCP 설정 JSON에 직접 넣지 마세요.
-
-저장소 루트에서 보안 설정기를 실행합니다.
+Playwright 브라우저 바이너리를 자동 다운로드하지 않습니다. 기본 Chrome이 없으면 아래 선택 설정으로 실행 파일을 지정하세요.
 
 ~~~bash
-node skills/job-match-search/scripts/configure-credentials.mjs
+export JOB_BROWSER_EXECUTABLE_PATH=/absolute/path/to/chrome
 ~~~
 
-설정기는 다음 순서로 동작합니다.
+## 선택 환경변수
 
-1. 설정할 플랫폼을 선택합니다.
-2. 인증값을 별표로 마스킹해 입력받습니다.
-3. 기본적으로 사용자 설정 디렉터리 아래 job-platform-mcp/credentials.json에 저장합니다.
-4. Linux, macOS, WSL에서는 파일 권한을 0600으로 제한합니다.
-5. 저장소 내부 경로, 심볼릭 링크, 다른 사용자가 읽을 수 있는 파일을 거부합니다.
-6. 값은 다시 출력하지 않고 플랫폼별 설정 여부만 보여줍니다.
+세 MCP가 같은 이름을 사용합니다. 인증정보는 없습니다.
 
-기본 저장 위치:
+| 환경변수 | 기본값 | 설명 |
+| --- | --- | --- |
+| JOB_BROWSER_CHANNEL | chrome | Playwright가 실행할 설치된 브라우저 채널 |
+| JOB_BROWSER_EXECUTABLE_PATH | 미설정 | 채널 대신 사용할 브라우저 실행 파일의 절대 경로 |
+| JOB_BROWSER_TIMEOUT_MS | 30000 | 페이지 이동 제한 시간 |
+| JOB_BROWSER_SETTLE_MS | 2000 | DOM이 표시될 때까지 추가로 기다리는 시간 |
 
-~~~text
-~/.config/job-platform-mcp/credentials.json
-~~~
+실행 파일 경로를 지정하면 채널 설정보다 우선합니다. 브라우저 프로필, 디버깅 포트, 쿠키 경로를 받는 옵션은 제공하지 않습니다.
 
-다른 절대 경로를 사용하려면 설정기와 MCP 호스트 양쪽에 JOB_MATCH_CREDENTIALS_FILE을 동일하게 설정합니다. 저장소 내부 경로는 사용할 수 없습니다.
+## MCP 호스트 등록
 
-설정 상태 확인:
-
-~~~bash
-node skills/job-match-search/scripts/configure-credentials.mjs --check
-~~~
-
-출력에는 실제 값이 포함되지 않습니다.
-
-~~~text
-Wanted: 설정됨
-사람인: 설정됨
-잡코리아: 미설정
-~~~
-
-이 파일은 OS 파일 권한으로 보호되는 로컬 JSON이며 자체 암호화 파일은 아닙니다. 네이티브 Windows에서는 에이전트나 MCP 호스트가 제공하는 OS secret store 사용을 권장합니다.
-
-### 5. MCP 호스트에 서버 등록
-
-인증정보를 MCP 설정에 직접 복사하지 않고 공통 실행기 [run-mcp.mjs](skills/job-match-search/scripts/run-mcp.mjs)를 등록합니다.
-
-먼저 전체 패키지를 빌드합니다.
-
-~~~bash
-pnpm build
-~~~
-
-아래 absolute-path를 실제 저장소 절대 경로로 바꿉니다.
+먼저 루트에서 빌드한 다음 공통 실행기를 등록합니다.
 
 ~~~json
 {
@@ -195,206 +119,152 @@ pnpm build
 }
 ~~~
 
-설정한 플랫폼만 등록해도 됩니다. MCP 호스트를 다시 시작한 다음 도구 목록에서 다음 이름을 확인합니다.
+사용할 플랫폼만 등록해도 됩니다. 호스트를 다시 시작한 뒤 다음 도구를 확인합니다.
 
 ~~~text
 wanted_get_search_options
-wanted_list_jobs
+wanted_search_jobs
 saramin_get_search_options
 saramin_search_jobs
-saramin_get_job
 jobkorea_get_search_options
-jobkorea_fetch_jobs
-jobkorea_fetch_entry_jobs
+jobkorea_search_jobs
 ~~~
 
-MCP 호스트가 서버 이름을 접두사로 붙이면 실제 노출 이름은 조금 다를 수 있습니다.
+클라이언트가 서버 이름을 접두사로 추가하면 실제 표시 이름은 다를 수 있습니다.
 
-## 에이전트를 위한 설정 절차
+## 검색 입력
 
-에이전트가 이 저장소를 설정할 때는 아래 순서를 따릅니다. 사람도 같은 절차를 사용할 수 있습니다.
+세 search_jobs 도구는 같은 입력 계약을 사용합니다.
 
-1. 현재 디렉터리가 pnpm-workspace.yaml이 있는 저장소 루트인지 확인합니다.
-2. node --version과 pnpm --version으로 요구 버전을 확인합니다.
-3. pnpm install과 pnpm build를 실행합니다.
-4. 사용자가 연결하려는 플랫폼과 인증정보 발급 여부를 묻습니다.
-5. 인증값을 일반 대화창에 입력하도록 요구하지 않습니다.
-6. 대화형 TTY에서 configure-credentials.mjs를 실행하고 사용자가 직접 마스킹 입력하게 합니다.
-7. 사용하는 에이전트 또는 MCP 호스트의 설정 위치를 확인합니다.
-8. 비밀값 없이 run-mcp.mjs의 절대 경로와 플랫폼 인자만 등록합니다.
-9. MCP 호스트를 다시 시작한 뒤 결과 수가 작은 읽기 전용 요청으로 연결을 확인합니다.
-10. 성공 시 연결된 플랫폼 이름만 보고합니다. 오류에도 인증값이나 잡코리아 발급 URL을 포함하지 않습니다.
+| 필드 | 필수 | 제한 | 의미 |
+| --- | --- | --- | --- |
+| query | 예 | 1~120자 | 직무명 중심 검색어 |
+| locations | 아니요 | 최대 5개 | 서울, 경기 같은 지역명 |
+| experience.minYears | 아니요 | 0~50 | 최소 경력 |
+| experience.maxYears | 아니요 | 0~50 | 최대 경력 |
+| employmentTypes | 아니요 | 정규직, 계약직, 인턴, 프리랜서 | 고용 형태 |
+| workModes | 아니요 | 출근, 하이브리드, 원격 | 근무 방식 |
+| includeKeywords | 아니요 | 최대 10개 | 기술·도메인 키워드 |
+| excludeKeywords | 아니요 | 최대 10개 | 읽은 화면 결과에서 제외할 키워드 |
+| limit | 아니요 | 1~20, 기본 10 | 현재 화면에서 반환할 최대 공고 |
+| acknowledgePersonalUse | 예 | true만 허용 | 개인·비상업용 단일 검색과 잔여 위험 확인 |
 
-에이전트가 대화형 TTY를 제공하지 못하면 설정 명령만 사용자에게 안내하고 입력이 끝날 때까지 기다립니다. 인증 실패를 자동으로 반복하지 않습니다.
+플랫폼의 불안정한 내부 코드나 비공개 엔드포인트를 사용하지 않기 위해 지역·경력·고용형태·근무방식은 공식 검색창에 넣을 자연어 검색어로 조합합니다. 사용자는 열린 화면의 공식 필터 UI에서 조건을 더 조정할 수 있습니다.
 
-## 채용 매칭 스킬 설치
+예시:
 
-스킬 원본은 다음 디렉터리에 있습니다.
-
-~~~text
-skills/job-match-search/
-├── SKILL.md
-├── references/
-├── scripts/
-└── test/
+~~~json
+{
+  "query": "백엔드 개발자",
+  "locations": ["서울", "경기"],
+  "experience": {
+    "minYears": 2,
+    "maxYears": 4
+  },
+  "employmentTypes": ["정규직"],
+  "workModes": ["출근", "하이브리드"],
+  "includeKeywords": ["Java", "Spring Boot", "NestJS"],
+  "excludeKeywords": ["교육과정", "부트캠프"],
+  "limit": 10,
+  "acknowledgePersonalUse": true
+}
 ~~~
 
-스킬은 공개 Agent Skills 형식을 사용하며 특정 에이전트 전용 frontmatter에 의존하지 않습니다. 클라이언트에 따라 검색하는 디렉터리만 다릅니다.
+이력서 문장 전체, 이름, 이메일, 전화번호, 상세 주소와 계정 식별자를 query나 키워드에 넣지 마세요.
+
+## 첫 검색 전 확인
+
+MCP는 키를 요구하지 않지만 검색 호출마다 acknowledgePersonalUse가 true여야 합니다. 에이전트는 최초 검색 전에 다음을 확인해야 합니다.
+
+1. 사용 목적이 본인의 구직을 위한 개인·비상업용인지 묻습니다.
+2. 플랫폼 약관과 자동화 관련 위험이 남아 있고 이 프로젝트가 이용허락이나 법률 자문을 제공하지 않는다고 알립니다.
+3. 지역, 근무 방식, 고용 형태와 결과를 크게 바꿀 희망·제외 조건을 한 번에 묻습니다.
+4. 사용자가 조건을 생략하면 넓게 검색할 수 있다고 안내합니다.
+5. 사용자가 고지를 받아들인 경우에만 acknowledgePersonalUse: true로 호출합니다.
+
+사용자가 수락하지 않거나 상업용·재판매·공유 데이터셋·예약 모니터링 목적이면 MCP 검색을 실행하지 않습니다. 사용자가 직접 제공한 개별 공고만 비교할 수 있습니다.
+
+## Agent Skill 설치
+
+원본은 skills/job-match-search에 있고 공개 Agent Skills 형식을 유지합니다.
 
 ### Codex
-
-개인 스킬 디렉터리에 원본 폴더를 연결합니다.
 
 ~~~bash
 mkdir -p ~/.codex/skills
 ln -s /absolute-path/job-platform-mcp/skills/job-match-search ~/.codex/skills/job-match-search
 ~~~
 
-같은 이름의 경로가 이미 있으면 삭제하거나 덮어쓰지 말고 기존 스킬을 먼저 확인합니다.
+같은 경로가 이미 있으면 덮어쓰지 말고 기존 파일 또는 심볼릭 링크를 확인하세요.
 
 ### Claude Code
-
-프로젝트 스킬 경로에 연결합니다.
 
 ~~~bash
 mkdir -p .claude/skills
 ln -s ../../skills/job-match-search .claude/skills/job-match-search
 ~~~
 
-Claude Code에서는 직접 호출할 때 다음처럼 사용합니다.
-
-~~~text
-/job-match-search 내 이력서에 맞는 백엔드 공고를 찾아줘
-~~~
-
 ### OpenCode
-
-프로젝트 스킬 경로에 연결합니다.
 
 ~~~bash
 mkdir -p .opencode/skills
 ln -s ../../skills/job-match-search .opencode/skills/job-match-search
 ~~~
 
-OpenCode는 .claude/skills와 .agents/skills 호환 경로도 지원합니다.
+### OpenClaw 및 기타 호환 클라이언트
 
-### OpenClaw
+클라이언트가 읽는 skills 디렉터리에 job-match-search 폴더를 복사하거나 심볼릭 링크로 연결합니다. SKILL.md의 name과 description을 임의로 바꾸지 않고 references와 scripts를 함께 설치합니다.
 
-이 저장소 자체를 OpenClaw workspace로 사용하면 현재 skills/job-match-search 경로가 자동 검색됩니다. 다른 workspace에 설치하려면:
+## 에이전트를 위한 자동 설정 절차
 
-~~~bash
-openclaw skills install /absolute-path/job-platform-mcp/skills/job-match-search
-~~~
+1. pnpm-workspace.yaml이 있는 저장소 루트인지 확인합니다.
+2. README.md와 AGENTS.md를 끝까지 읽습니다.
+3. Node.js, pnpm, Git과 화면 표시가 가능한 Chrome 설치 여부를 확인합니다.
+4. pnpm install --frozen-lockfile, pnpm build, pnpm verify를 실행합니다.
+5. MCP 호스트 설정에 run-mcp.mjs와 플랫폼 인자만 등록합니다. 인증정보를 요청하지 않습니다.
+6. MCP 호스트를 다시 시작하고 get_search_options 도구로 연결을 검증합니다.
+7. 최초 실제 검색 전에 개인·비상업용 목적과 위험 고지 수락을 확인합니다.
+8. 이력서에서는 최소한의 파생 검색 조건만 만들고 search_jobs를 호출합니다.
+9. CAPTCHA, 차단, 로그인 요구 또는 비정상 접근 안내가 보이면 해당 플랫폼을 즉시 중단합니다.
 
-심볼릭 링크를 지원하지 않는 환경에서는 폴더 전체를 해당 클라이언트의 스킬 경로로 복사합니다. SKILL.md뿐 아니라 references와 scripts도 함께 복사해야 합니다.
+## 결과 형식
 
-## 스킬 사용법
+각 search_jobs 도구는 provider, mode, searchUrl, resultCount, results와 notice를 반환합니다. results에는 title, url, 현재 카드 주변의 최대 600자 summary가 포함됩니다. 이 문맥은 전체 공고나 정확한 자격요건을 대신하지 않으므로 추천 후보는 원문 화면에서 다시 확인해야 합니다.
 
-이력서나 포트폴리오를 첨부하거나 에이전트가 읽을 수 있는 로컬 경로를 지정합니다.
+## 개발
 
-~~~text
-$job-match-search
-첨부한 이력서를 분석해서 내 경력에 맞는 채용공고를 찾아줘.
-~~~
-
-지역과 조건을 함께 지정할 수 있습니다.
-
-~~~text
-$job-match-search
-서울 또는 판교, 주 2회 이하 출근, 정규직 백엔드 포지션을 찾아줘.
-Java와 Spring 실무 경험을 중요하게 보고 연봉이 공개된 공고를 우선해줘.
-~~~
-
-조건을 정하지 않고 시작해도 됩니다.
-
-~~~text
-$job-match-search
-내 포트폴리오에 맞는 공고를 찾아줘. 조건은 아직 정하지 않았어.
-~~~
-
-이 경우 스킬이 지역, 출근 방식, 고용 형태와 주요 선호를 한 번에 질문합니다. 답변을 건너뛰면 제한 없이 넓게 검색합니다.
-
-기본 결과에는 다음 정보가 포함됩니다.
-
-- 분석한 검색 프로필과 명시한 가정
-- 적합도 상위 10개 공고
-- 확인된 일치 근거와 부족하거나 미확인인 요건
-- 지역, 근무 형태, 마감일, 출처와 원문 링크
-- 조회한 플랫폼, 검색어, 필터와 실패한 범위
-
-적합도 점수는 비교용 휴리스틱이며 합격 확률이 아닙니다.
-
-## 개발 명령
-
-기여 절차는 [CONTRIBUTING.md](CONTRIBUTING.md), 코딩 에이전트의 저장소 지침은 [AGENTS.md](AGENTS.md)를 참고합니다. 모든 비긴급 변경은 Issue → 이슈 브랜치 → 검증 → 커밋 → Pull Request → 리뷰 → 병합 순서로 진행합니다.
-
-main 브랜치에 직접 커밋하거나 푸시하지 않습니다.
-
-전체 workspace:
+[CONTRIBUTING.md](CONTRIBUTING.md)와 [AGENTS.md](AGENTS.md)를 따릅니다.
 
 ~~~bash
-pnpm install
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm install --frozen-lockfile
 pnpm verify
+git diff --check
 ~~~
 
-패키지 하나만 검사하려면:
+빠른 테스트:
 
 ~~~bash
+pnpm --filter @job-platform/browser-search-core test
 pnpm --filter wanted-mcp test
 pnpm --filter saramin-mcp test
 pnpm --filter jobkorea-mcp test
-~~~
-
-보안 저장소 테스트만 실행하려면:
-
-~~~bash
 pnpm test:skill
 ~~~
 
-## 프로젝트 구조
-
-~~~text
-.
-├── packages/
-│   ├── wanted-mcp/
-│   ├── saramin-mcp/
-│   └── jobkorea-mcp/
-├── skills/
-│   └── job-match-search/
-├── package.json
-├── pnpm-lock.yaml
-└── pnpm-workspace.yaml
-~~~
-
-루트 workspace는 의존성 설치, 단일 lockfile과 전체 검증만 통합합니다. 각 MCP의 설정, 클라이언트, 도구 스키마와 테스트는 해당 패키지 안에 유지됩니다.
-
 ## 문제 해결
 
-| 증상 | 확인할 내용 |
+| 증상 | 확인 |
 | --- | --- |
-| Built MCP entry not found | 루트에서 pnpm build를 실행했는지 확인 |
-| Missing required configuration | configure-credentials.mjs --check로 해당 플랫폼 설정 여부 확인 |
-| Credential store permissions are too broad | Linux, macOS, WSL에서 인증 파일에 chmod 600 적용 |
-| Credential store must be outside the project workspace | 기본 사용자 설정 경로를 사용하거나 저장소 밖의 절대 경로 지정 |
-| Wanted 401 또는 403 | Client ID, Secret, 선택 Authorization과 계정 권한 확인 |
-| 사람인 인증 오류 | SARAMIN_ACCESS_KEY 발급 상태와 사용량 제한 확인 |
-| 잡코리아 연결 오류 | 승인 상태, 등록된 요청 IP, 발급 URL과 허용 호스트 확인 |
-| MCP 도구가 보이지 않음 | 절대 경로, node 실행 경로, MCP 호스트 재시작 여부 확인 |
-| 일부 플랫폼만 실패 | 정상 연결된 플랫폼 검색은 계속하고 실패한 플랫폼 설정만 점검 |
+| Chrome 실행 파일을 찾지 못함 | Chrome 설치 또는 JOB_BROWSER_EXECUTABLE_PATH 절대 경로 |
+| 브라우저 창이 보이지 않음 | 데스크톱 화면 세션에서 MCP 호스트가 실행되는지 확인 |
+| 검색 결과가 0건 | 페이지 표시를 확인하고 JOB_BROWSER_SETTLE_MS를 소폭 늘림 |
+| access restriction or CAPTCHA | 자동화를 중단하고 직접 확인. 우회하지 않음 |
+| Built MCP entry not found | 루트에서 pnpm build 실행 |
+| MCP 도구가 보이지 않음 | run-mcp.mjs 절대 경로와 MCP 호스트 재시작 확인 |
+| 화면 구조 변경으로 링크를 못 읽음 | 해당 플랫폼 선택자 변경 Issue 생성 |
 
-## 보안 주의사항
+## 준수와 책임
 
-- 실제 인증정보를 Git에 커밋하지 마세요.
-- 인증정보를 이슈, PR, 채팅 또는 로그에 붙여 넣지 마세요.
-- 노출된 키는 즉시 폐기하고 플랫폼에서 재발급하세요.
-- 잡코리아 호출 URL은 URL 전체를 비밀정보로 취급하세요.
-- 인증 저장소 파일을 클라우드 동기화 폴더나 공유 디렉터리에 두지 마세요.
-- 다른 사람이 관리하는 스킬이나 스크립트에 인증 저장소 접근 권한을 주지 마세요.
+개인·비상업용, 화면 표시, 최대 20건, 무저장이라는 제한은 위험을 줄이는 프로젝트 정책일 뿐 플랫폼의 동의나 적법성 보증이 아닙니다. 브라우저 자동화도 자동화이며 robots.txt와 별개로 약관, 저작권, 데이터베이스 권리, 접근 제한과 서비스 안정성을 검토해야 합니다.
 
-## 라이선스와 API 이용 조건
-
-각 채용 플랫폼의 데이터, API 사용 조건, 호출 제한과 과금 정책은 해당 플랫폼 약관을 따릅니다. 이 저장소는 인증 권한이나 유료 기능을 우회하지 않으며 API 데이터의 재배포 권한을 제공하지 않습니다.
+자세한 내용과 공식 근거는 [COMPLIANCE.md](COMPLIANCE.md)를 확인하세요.

@@ -1,24 +1,24 @@
+import type { VisibleBrowserCrawler } from "@job-platform/browser-search-core";
 import { McpServer, McpTool } from "@theorvane/type-mcp";
 import {
   type GetSearchOptionsInput,
   getSearchOptions,
   getSearchOptionsInputSchema,
-  type ListJobsInput,
-  listJobs,
-  listJobsInputSchema,
+  type SearchJobsInput,
+  searchJobs,
+  searchJobsInputSchema,
 } from "./tools/jobs.js";
-import type { WantedClient } from "./wanted-client.js";
 
 const json = (value: unknown) => JSON.stringify(value, null, 2);
 
-@McpServer({ name: "wanted-mcp", version: "0.1.0" })
+@McpServer({ name: "wanted-mcp", version: "0.2.0" })
 export class WantedMcpServer {
-  client!: WantedClient;
+  client!: VisibleBrowserCrawler;
 
   @McpTool({
     name: "wanted_get_search_options",
     description:
-      "원티드 채용 검색의 정렬 코드, 지원 우대 코드, 경력 범위, 태그 필터 제한, 페이지 방식을 조회합니다. 검색 전에 허용값이 필요할 때 호출합니다.",
+      "원티드 사용자 표시형 브라우저 검색의 지역·경력·고용형태·근무방식·키워드·결과 수 옵션과 안전 경계를 조회합니다. API 키는 사용하지 않습니다.",
     input: getSearchOptionsInputSchema,
   })
   getSearchOptions(_input: GetSearchOptionsInput): string {
@@ -26,12 +26,12 @@ export class WantedMcpServer {
   }
 
   @McpTool({
-    name: "wanted_list_jobs",
+    name: "wanted_search_jobs",
     description:
-      "원티드 포지션 목록을 조회합니다. 정렬, 경력(0~10), 지역, 직군 ID, 직무·스킬·매력 태그 ID(각 최대 5개), 지원 우대, offset/limit을 지원합니다. 코드 의미는 wanted_get_search_options로 확인할 수 있습니다.",
-    input: listJobsInputSchema,
+      "화면이 보이는 브라우저에서 원티드 공개 검색을 한 번 실행하고 현재 화면의 공고를 최대 20건 반환합니다. 개인·비상업용 확인이 필수이며 로그인·CAPTCHA·차단을 우회하거나 다음 페이지를 자동 수집하지 않습니다.",
+    input: searchJobsInputSchema,
   })
-  async listJobs(input: ListJobsInput): Promise<string> {
-    return json(await listJobs(this.client, input));
+  async searchJobs(input: SearchJobsInput): Promise<string> {
+    return json(await searchJobs(this.client, input));
   }
 }

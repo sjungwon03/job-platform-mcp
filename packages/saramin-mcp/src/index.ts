@@ -2,14 +2,22 @@
 
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  loadBrowserConfig,
+  VisibleBrowserCrawler,
+} from "@job-platform/browser-search-core";
 import { createMcpServer, serveStdioServer } from "@theorvane/type-mcp";
-import { loadSaraminConfig } from "./config.js";
-import { SaraminClient } from "./saramin-client.js";
 import { SaraminMcpServer } from "./server.js";
 
 export async function start(): Promise<void> {
-  const config = loadSaraminConfig(process.env);
-  const client = new SaraminClient(config);
+  const client = new VisibleBrowserCrawler(loadBrowserConfig(process.env), {
+    provider: "saramin",
+    hostname: "www.saramin.co.kr",
+    linkSelector: 'a[href*="/zf_user/jobs/relay/view"]',
+    isJobUrl: (url) =>
+      url.pathname === "/zf_user/jobs/relay/view" &&
+      /^\d+$/.test(url.searchParams.get("rec_idx") ?? ""),
+  });
 
   serveStdioServer(() =>
     createMcpServer(SaraminMcpServer, {

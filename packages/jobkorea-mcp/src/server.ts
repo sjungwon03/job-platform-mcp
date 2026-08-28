@@ -1,48 +1,37 @@
+import type { VisibleBrowserCrawler } from "@job-platform/browser-search-core";
 import { McpServer, McpTool } from "@theorvane/type-mcp";
-import type { JobKoreaClient } from "./jobkorea-client.js";
 import {
-  type FetchJobsInput,
-  fetchJobs,
-  fetchJobsInputSchema,
   type GetSearchOptionsInput,
   getSearchOptions,
   getSearchOptionsInputSchema,
+  type SearchJobsInput,
+  searchJobs,
+  searchJobsInputSchema,
 } from "./tools/jobs.js";
 
-const output = (value: unknown) =>
-  typeof value === "string" ? value : JSON.stringify(value, null, 2);
+const json = (value: unknown) => JSON.stringify(value, null, 2);
 
-@McpServer({ name: "jobkorea-mcp", version: "0.1.0" })
+@McpServer({ name: "jobkorea-mcp", version: "0.2.0" })
 export class JobKoreaMcpServer {
-  client!: JobKoreaClient;
+  client!: VisibleBrowserCrawler;
 
   @McpTool({
     name: "jobkorea_get_search_options",
     description:
-      "잡코리아의 일반·신입공채 피드 구분, 사용자별 발급 가이드의 검색 파라미터 적용 규칙, 허용 키·값 형식과 응답 형식을 조회합니다.",
+      "잡코리아 사용자 표시형 브라우저 검색의 지역·경력·고용형태·근무방식·키워드·결과 수 옵션과 안전 경계를 조회합니다. API 키는 사용하지 않습니다.",
     input: getSearchOptionsInputSchema,
   })
   getSearchOptions(_input: GetSearchOptionsInput): string {
-    return output(getSearchOptions());
+    return json(getSearchOptions());
   }
 
   @McpTool({
-    name: "jobkorea_fetch_jobs",
+    name: "jobkorea_search_jobs",
     description:
-      "잡코리아에서 발급받은 채용정보 API 호출 링크로 신입·경력 공고를 가져옵니다. parameters에는 함께 발급된 사용자별 가이드의 조건만 전달하며 발급 URL의 기존 키는 덮어쓸 수 없습니다.",
-    input: fetchJobsInputSchema,
+      "화면이 보이는 브라우저에서 잡코리아 공개 검색을 한 번 실행하고 현재 화면의 공고를 최대 20건 반환합니다. 개인·비상업용 확인이 필수이며 로그인·CAPTCHA·차단을 우회하거나 다음 페이지를 자동 수집하지 않습니다.",
+    input: searchJobsInputSchema,
   })
-  async fetchJobs(input: FetchJobsInput): Promise<string> {
-    return output(await fetchJobs(this.client, "jobs", input));
-  }
-
-  @McpTool({
-    name: "jobkorea_fetch_entry_jobs",
-    description:
-      "잡코리아에서 발급받은 신입공채 API 호출 링크로 신입·인턴 공고를 가져옵니다. parameters에는 함께 발급된 사용자별 가이드의 조건만 전달하며 발급 URL의 기존 키는 덮어쓸 수 없습니다.",
-    input: fetchJobsInputSchema,
-  })
-  async fetchEntryJobs(input: FetchJobsInput): Promise<string> {
-    return output(await fetchJobs(this.client, "entryJobs", input));
+  async searchJobs(input: SearchJobsInput): Promise<string> {
+    return json(await searchJobs(this.client, input));
   }
 }

@@ -2,14 +2,20 @@
 
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  loadBrowserConfig,
+  VisibleBrowserCrawler,
+} from "@job-platform/browser-search-core";
 import { createMcpServer, serveStdioServer } from "@theorvane/type-mcp";
-import { loadJobKoreaConfig } from "./config.js";
-import { JobKoreaClient } from "./jobkorea-client.js";
 import { JobKoreaMcpServer } from "./server.js";
 
 export async function start(): Promise<void> {
-  const config = loadJobKoreaConfig(process.env);
-  const client = new JobKoreaClient(config);
+  const client = new VisibleBrowserCrawler(loadBrowserConfig(process.env), {
+    provider: "jobkorea",
+    hostname: "www.jobkorea.co.kr",
+    linkSelector: 'a[href*="/Recruit/GI_Read"]',
+    isJobUrl: (url) => /^\/Recruit\/GI_Read(?:\/|$)/i.test(url.pathname),
+  });
 
   serveStdioServer(() =>
     createMcpServer(JobKoreaMcpServer, {

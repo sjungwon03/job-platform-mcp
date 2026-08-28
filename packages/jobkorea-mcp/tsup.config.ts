@@ -7,6 +7,8 @@ export default defineConfig({
   target: "node22",
   clean: true,
   sourcemap: true,
+  noExternal: ["@job-platform/browser-search-core"],
+  external: ["playwright-core"],
   banner: {
     js: "#!/usr/bin/env node",
   },

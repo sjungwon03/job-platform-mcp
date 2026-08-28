@@ -2,14 +2,20 @@
 
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  loadBrowserConfig,
+  VisibleBrowserCrawler,
+} from "@job-platform/browser-search-core";
 import { createMcpServer, serveStdioServer } from "@theorvane/type-mcp";
-import { loadWantedConfig } from "./config.js";
 import { WantedMcpServer } from "./server.js";
-import { WantedClient } from "./wanted-client.js";
 
 export async function start(): Promise<void> {
-  const config = loadWantedConfig(process.env);
-  const client = new WantedClient(config);
+  const client = new VisibleBrowserCrawler(loadBrowserConfig(process.env), {
+    provider: "wanted",
+    hostname: "www.wanted.co.kr",
+    linkSelector: 'a[href*="/wd/"]',
+    isJobUrl: (url) => /^\/wd\/\d+/.test(url.pathname),
+  });
 
   serveStdioServer(() =>
     createMcpServer(WantedMcpServer, {
