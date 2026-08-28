@@ -9,7 +9,4 @@ export default defineConfig({
   sourcemap: true,
   noExternal: ["@job-platform/browser-search-core"],
   external: ["playwright-core"],
-  banner: {
-    js: "#!/usr/bin/env node",
-  },
 });
