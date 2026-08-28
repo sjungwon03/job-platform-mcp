@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSearchUrl, searchJobsInputSchema } from "../src/tools/jobs.js";
 
-describe("사람인 browser job search", () => {
+describe("잡코리아 browser job search", () => {
   it("builds an official search URL from derived conditions", () => {
     const input = searchJobsInputSchema.parse({
       query: "백엔드",
@@ -15,10 +15,10 @@ describe("사람인 browser job search", () => {
     const url = buildSearchUrl(input);
 
     expect(url.origin + url.pathname).toBe(
-      "https://www.saramin.co.kr/zf_user/search/recruit",
+      "https://www.jobkorea.co.kr/Search/",
     );
-    expect(url.searchParams.get("searchword")).toContain("백엔드 서울 경기");
-    expect(url.searchParams.get("searchword")).toContain("경력 2-4년");
+    expect(url.searchParams.get("stext")).toContain("백엔드 서울 경기");
+    expect(url.searchParams.get("stext")).toContain("경력 2-4년");
   });
 
   it("rejects invalid ranges and more than 20 visible results", () => {

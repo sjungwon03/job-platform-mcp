@@ -4,10 +4,16 @@ import { describe, expect, it, vi } from "vitest";
 import { WantedMcpServer } from "../src/server.js";
 
 describe("WantedMcpServer", () => {
-  it("registers the jobs tool and validates input before API access", async () => {
+  it("registers visible-browser tools and validates consent before launch", async () => {
     const instance = new WantedMcpServer();
     instance.client = {
-      get: vi.fn(async () => ({ items: [] })),
+      search: vi.fn(async () => ({
+        provider: "wanted",
+        mode: "visible-browser",
+        searchUrl: "https://example.invalid",
+        resultCount: 0,
+        results: [],
+      })),
     } as never;
     const session = await createMcpTestSession(
       createMcpServer(WantedMcpServer, {
@@ -20,41 +26,33 @@ describe("WantedMcpServer", () => {
     expect(tools).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "wanted_get_search_options" }),
-        expect.objectContaining({ name: "wanted_list_jobs" }),
+        expect.objectContaining({
+          name: "wanted_search_jobs",
+          description: expect.stringContaining("화면이 보이는 브라우저"),
+        }),
       ]),
     );
-    expect(tools.find(({ name }) => name === "wanted_list_jobs")).toMatchObject(
-      {
-        description: expect.stringContaining("wanted_get_search_options"),
-        inputSchema: {
-          properties: {
-            skill_tags: { maxItems: 5 },
-            years: { maxItems: 2 },
-            sort: {
-              default: "job.latest_order",
-              description: expect.stringContaining("기업 응답률순"),
-            },
+    expect(
+      tools.find(({ name }) => name === "wanted_search_jobs"),
+    ).toMatchObject({
+      inputSchema: {
+        properties: {
+          locations: { maxItems: 5 },
+          limit: { default: 10, maximum: 20 },
+          acknowledgePersonalUse: {
+            description: expect.stringContaining("개인·비상업용"),
           },
         },
       },
-    );
-    await expect(
-      session.client.callTool({
-        name: "wanted_get_search_options",
-        arguments: {},
-      }),
-    ).resolves.toMatchObject({
-      content: [
-        { type: "text", text: expect.stringContaining("job.latest_order") },
-      ],
     });
+
     await expect(
       session.client.callTool({
-        name: "wanted_list_jobs",
-        arguments: { skill_tags: [1, 2, 3, 4, 5, 6] },
+        name: "wanted_search_jobs",
+        arguments: { query: "백엔드" },
       }),
     ).resolves.toMatchObject({ isError: true });
-    expect(instance.client.get).not.toHaveBeenCalled();
+    expect(instance.client.search).not.toHaveBeenCalled();
 
     await session.close();
   });

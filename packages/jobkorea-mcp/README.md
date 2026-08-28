@@ -1,74 +1,74 @@
 # jobkorea-mcp
 
-[잡코리아 채용정보 API](https://www.jobkorea.co.kr/service/api)를 MCP 도구로 제공하는 독립 TypeMCP 0.4.0 패키지입니다. 분리형 MCP SDK v2 stdio 런타임으로 2025·2026 프로토콜을 협상합니다.
+잡코리아의 공개 채용 검색 화면을 사용자가 볼 수 있는 브라우저에서 열고 현재 화면에 표시된 공고를 최대 20건 읽는 독립 TypeMCP stdio 서버입니다. 채용 API와 인증키를 사용하지 않습니다.
 
-## 전제 조건
+## 도구
 
-잡코리아 API는 공개 공통 엔드포인트나 공용 API 키 방식이 아닙니다. 이용 신청과 내부 승인 후 요청 IP가 등록되고 고유 호출 링크와 가이드가 발급됩니다. 공공기관과 학교가 우선 제공 대상이며 기업·개인은 내부 검토 결과에 따라 제공되지 않을 수 있습니다.
+### jobkorea_get_search_options
 
-발급받은 URL은 인증정보로 취급합니다.
+입력 없이 공통 검색 필드, 값 제한, 개인 사용 확인과 브라우저 안전 경계를 반환합니다.
 
-- 저장소나 로그에 URL을 남기지 않습니다.
-- HTTPS의 jobkorea.co.kr 호스트만 허용합니다.
-- 발급 URL에 포함된 파라미터는 MCP 입력으로 덮어쓸 수 없습니다.
-- 잡코리아가 함께 제공한 가이드에 명시된 검색 조건만 parameters에 전달합니다.
+### jobkorea_search_jobs
 
-## 제공 도구
+https://www.jobkorea.co.kr/Search/에서 공개 검색을 한 번 실행합니다.
 
-| 도구 | 필요한 환경변수 | 설명 |
-| --- | --- | --- |
-| jobkorea_get_search_options | - | 피드 구분과 사용자별 파라미터 적용 규칙 조회 |
-| jobkorea_fetch_jobs | JOBKOREA_JOBS_API_URL | 신입·경력 채용정보 피드 호출 |
-| jobkorea_fetch_entry_jobs | JOBKOREA_ENTRY_API_URL | 신입·인턴 공채 피드 호출 |
+| 입력 | 제한 |
+| --- | --- |
+| query | 필수, 1~120자 |
+| locations | 최대 5개 |
+| experience.minYears / maxYears | 각각 0~50, 최소는 최대 이하 |
+| employmentTypes | 정규직, 계약직, 인턴, 프리랜서 |
+| workModes | 출근, 하이브리드, 원격 |
+| includeKeywords / excludeKeywords | 각각 최대 10개 |
+| limit | 1~20, 기본값 10 |
+| acknowledgePersonalUse | true만 허용 |
 
-서버를 시작하려면 두 URL 중 하나 이상이 필요합니다. 설정되지 않은 피드만 호출하면 명확한 설정 오류를 반환합니다. JSON 응답은 구조화해 반환하고 XML 응답은 원문 텍스트로 반환합니다.
+검색 조건은 공식 검색창에 넣을 자연어로 조합됩니다. 열린 브라우저에서 사용자가 공식 필터 UI를 추가로 조정할 수 있습니다. 이력서 원문이나 개인정보를 입력하지 마세요.
 
-## 채용 검색 상세 옵션
+## 화면 추출
 
-잡코리아는 모든 사용자에게 공통인 공개 검색 파라미터 목록을 게시하지 않습니다. 승인 후 고유 호출 URL과 함께 받은 가이드가 해당 사용자의 유일한 기준이므로 MCP는 플랫폼 파라미터 이름을 임의로 만들지 않습니다.
+- Playwright Core로 설치된 Chrome을 headless: false로 실행합니다.
+- 새 비영구 컨텍스트와 탭 하나를 사용합니다.
+- a[href*="/Recruit/GI_Read"]에 해당하고 화면에 실제 크기가 있는 HTTPS 링크만 후보로 봅니다.
+- 최종 URL의 호스트를 다시 확인하고 제목, URL, 최대 600자의 카드 문맥을 반환합니다.
+- excludeKeywords는 현재 화면에서 읽은 카드 문맥에만 적용됩니다.
+- CAPTCHA 또는 접근 제한 문구가 보이면 즉시 실패합니다.
 
-`parameters`에는 발급 가이드에 있는 조건만 객체로 전달합니다.
+선택자는 플랫폼 화면 개편에 따라 바뀔 수 있습니다. 결과가 0건이면 브라우저 화면을 확인한 뒤 Issue로 선택자 변경을 제안하세요.
 
-- 키: 영문 대·소문자, 숫자, `_`, `.`, `-`
-- 값: 문자열, 숫자 또는 불리언
-- 발급 URL에 이미 포함된 키: 덮어쓰기 금지
-- 가이드를 확인할 수 없는 경우: 빈 객체로 조회한 뒤 결과를 로컬에서 후처리
+## 실행
 
-에이전트는 먼저 `jobkorea_get_search_options`를 호출해 이 규칙과 피드 구분을 확인할 수 있습니다. 실제 발급 가이드에 더 좁은 제약이 있으면 가이드가 우선합니다.
-
-## 빌드
-
-모노레포 루트에서:
+저장소 루트에서:
 
 ~~~bash
-pnpm install
+pnpm install --frozen-lockfile
 pnpm --filter jobkorea-mcp build
-pnpm --filter jobkorea-mcp test
+pnpm --filter jobkorea-mcp start
 ~~~
 
-MCP 호스트 설정 예시:
+MCP 호스트에는 다음처럼 등록합니다.
 
 ~~~json
 {
-  "mcpServers": {
-    "jobkorea": {
-      "command": "node",
-      "args": ["/absolute/path/to/packages/jobkorea-mcp/dist/index.js"],
-      "env": {
-        "JOBKOREA_JOBS_API_URL": "your-issued-call-url",
-        "JOBKOREA_ENTRY_API_URL": "your-issued-entry-call-url"
-      }
-    }
-  }
+  "command": "node",
+  "args": [
+    "/absolute-path/job-platform-mcp/skills/job-match-search/scripts/run-mcp.mjs",
+    "jobkorea"
+  ]
 }
 ~~~
 
-## 설정
+인증 설정은 없습니다. 선택 환경변수:
 
-| 환경변수 | 필수 | 설명 |
-| --- | --- | --- |
-| JOBKOREA_JOBS_API_URL | 조건부 | 발급받은 일반 채용정보 고유 호출 링크 |
-| JOBKOREA_ENTRY_API_URL | 조건부 | 발급받은 신입공채 고유 호출 링크 |
-| JOBKOREA_REQUEST_TIMEOUT_MS | 아니요 | 요청 제한 시간, 기본 10000ms |
+~~~text
+JOB_BROWSER_CHANNEL=chrome
+JOB_BROWSER_EXECUTABLE_PATH=/absolute/path/to/chrome
+JOB_BROWSER_TIMEOUT_MS=30000
+JOB_BROWSER_SETTLE_MS=2000
+~~~
 
-고유 호출 링크 발급과 IP 등록은 [잡코리아 API 안내](https://www.jobkorea.co.kr/service/api)를 참고하세요.
+## 제한
+
+개인·비상업용 단일 검색만 지원합니다. 다음 페이지 자동 순회, 무한 스크롤, 상세 페이지 묶음 탐색, 로그인, 지원, 결제, 결과 저장, 숨겨진 API, 내장 JSON, 위장 헤더와 차단 우회는 지원하지 않습니다.
+
+사용 전 루트 COMPLIANCE.md와 잡코리아 최신 약관을 확인하세요.

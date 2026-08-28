@@ -1,5 +1,5 @@
 name: 기능 제안
-description: 새로운 MCP 도구, 스킬 동작 또는 개발 개선을 제안합니다.
+description: 새로운 브라우저 MCP 도구, 스킬 동작 또는 개발 개선을 제안합니다.
 title: "feat: "
 labels:
   - enhancement
@@ -9,6 +9,7 @@ body:
     attributes:
       label: 대상
       options:
+        - browser-search-core
         - wanted-mcp
         - saramin-mcp
         - jobkorea-mcp
@@ -31,7 +32,7 @@ body:
     id: proposal
     attributes:
       label: 제안
-      description: 원하는 동작과 입력·출력 예시를 작성해 주세요.
+      description: 화면 표시 방식, 검색 조건과 입력·출력 예시를 작성해 주세요.
     validations:
       required: true
 
@@ -46,15 +47,15 @@ body:
       required: true
 
   - type: textarea
-    id: api
+    id: browser
     attributes:
-      label: 공식 API 근거
-      description: 관련 공식 문서와 필요한 권한·과금 정보를 적어 주세요.
+      label: 공개 화면 근거
+      description: 관련 공식 공개 검색 URL, 화면 요소와 예상되는 구조 변경 위험을 적어 주세요.
 
   - type: textarea
-    id: security
+    id: compliance
     attributes:
-      label: 보안과 개인정보 영향
-      description: 새 인증정보, 외부 전송, 이력서 데이터 또는 결제가 관련되는지 적어 주세요.
+      label: 자동화·보안·개인정보 영향
+      description: 결과 수, 페이지 이동, 저장, 접근 제한, 이력서 데이터와 약관 영향이 있는지 적어 주세요.
     validations:
       required: true

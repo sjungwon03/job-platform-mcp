@@ -4,10 +4,16 @@ import { describe, expect, it, vi } from "vitest";
 import { SaraminMcpServer } from "../src/server.js";
 
 describe("SaraminMcpServer", () => {
-  it("registers both tools and validates input before API access", async () => {
+  it("registers visible-browser tools and validates consent before launch", async () => {
     const instance = new SaraminMcpServer();
     instance.client = {
-      get: vi.fn(async () => ({ jobs: { job: [] } })),
+      search: vi.fn(async () => ({
+        provider: "saramin",
+        mode: "visible-browser",
+        searchUrl: "https://example.invalid",
+        resultCount: 0,
+        results: [],
+      })),
     } as never;
     const session = await createMcpTestSession(
       createMcpServer(SaraminMcpServer, {
@@ -20,43 +26,33 @@ describe("SaraminMcpServer", () => {
     expect(tools).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "saramin_get_search_options" }),
-        expect.objectContaining({ name: "saramin_search_jobs" }),
-        expect.objectContaining({ name: "saramin_get_job" }),
+        expect.objectContaining({
+          name: "saramin_search_jobs",
+          description: expect.stringContaining("화면이 보이는 브라우저"),
+        }),
       ]),
     );
     expect(
       tools.find(({ name }) => name === "saramin_search_jobs"),
     ).toMatchObject({
-      description: expect.stringContaining("saramin_get_search_options"),
       inputSchema: {
         properties: {
-          job_type: { description: expect.stringContaining("1~22") },
-          edu_lv: { description: expect.stringContaining("0~9") },
-          count: { default: 10, maximum: 110 },
-          sort: {
-            default: "pd",
-            description: expect.stringContaining("지원자 수"),
+          locations: { maxItems: 5 },
+          limit: { default: 10, maximum: 20 },
+          acknowledgePersonalUse: {
+            description: expect.stringContaining("개인·비상업용"),
           },
         },
       },
     });
-    await expect(
-      session.client.callTool({
-        name: "saramin_get_search_options",
-        arguments: {},
-      }),
-    ).resolves.toMatchObject({
-      content: [
-        { type: "text", text: expect.stringContaining("전문연구요원") },
-      ],
-    });
+
     await expect(
       session.client.callTool({
         name: "saramin_search_jobs",
-        arguments: { count: 111 },
+        arguments: { query: "백엔드" },
       }),
     ).resolves.toMatchObject({ isError: true });
-    expect(instance.client.get).not.toHaveBeenCalled();
+    expect(instance.client.search).not.toHaveBeenCalled();
 
     await session.close();
   });
