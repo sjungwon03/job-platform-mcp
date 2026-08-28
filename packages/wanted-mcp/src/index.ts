@@ -2,7 +2,7 @@
 
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createMcpServer, startStdioServer } from "@theorvane/type-mcp";
+import { createMcpServer, serveStdioServer } from "@theorvane/type-mcp";
 import { loadWantedConfig } from "./config.js";
 import { WantedMcpServer } from "./server.js";
 import { WantedClient } from "./wanted-client.js";
@@ -10,11 +10,12 @@ import { WantedClient } from "./wanted-client.js";
 export async function start(): Promise<void> {
   const config = loadWantedConfig(process.env);
   const client = new WantedClient(config);
-  const server = await createMcpServer(WantedMcpServer, {
-    resolve: () => Object.assign(new WantedMcpServer(), { client }),
-  });
 
-  await startStdioServer(server);
+  serveStdioServer(() =>
+    createMcpServer(WantedMcpServer, {
+      resolve: () => Object.assign(new WantedMcpServer(), { client }),
+    }),
+  );
 }
 
 const entrypoint = process.argv[1] ? resolve(process.argv[1]) : undefined;

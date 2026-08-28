@@ -1,6 +1,5 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createMcpServer } from "@theorvane/type-mcp";
+import { createMcpTestSession } from "@theorvane/type-mcp/testing";
 import { describe, expect, it, vi } from "vitest";
 import { JobKoreaMcpServer } from "../src/server.js";
 
@@ -10,19 +9,14 @@ describe("JobKoreaMcpServer", () => {
     instance.client = {
       fetchFeed: vi.fn(async () => ({ jobs: [] })),
     } as never;
-    const server = await createMcpServer(JobKoreaMcpServer, {
-      resolve: () => instance,
-    });
-    const [clientTransport, serverTransport] =
-      InMemoryTransport.createLinkedPair();
-    const client = new Client({ name: "test-client", version: "1.0.0" });
+    const session = await createMcpTestSession(
+      createMcpServer(JobKoreaMcpServer, {
+        resolve: () => instance,
+      }),
+      { client: { name: "test-client", version: "1.0.0" } },
+    );
 
-    await Promise.all([
-      server.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
-
-    const tools = (await client.listTools()).tools;
+    const tools = (await session.client.listTools()).tools;
     expect(tools).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "jobkorea_get_search_options" }),
@@ -43,7 +37,10 @@ describe("JobKoreaMcpServer", () => {
       },
     });
     await expect(
-      client.callTool({ name: "jobkorea_get_search_options", arguments: {} }),
+      session.client.callTool({
+        name: "jobkorea_get_search_options",
+        arguments: {},
+      }),
     ).resolves.toMatchObject({
       content: [
         {
@@ -53,14 +50,13 @@ describe("JobKoreaMcpServer", () => {
       ],
     });
     await expect(
-      client.callTool({
+      session.client.callTool({
         name: "jobkorea_fetch_jobs",
         arguments: { parameters: { "bad parameter": "value" } },
       }),
     ).resolves.toMatchObject({ isError: true });
     expect(instance.client.fetchFeed).not.toHaveBeenCalled();
 
-    await client.close();
-    await server.close();
+    await session.close();
   });
 });

@@ -2,7 +2,7 @@
 
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createMcpServer, startStdioServer } from "@theorvane/type-mcp";
+import { createMcpServer, serveStdioServer } from "@theorvane/type-mcp";
 import { loadJobKoreaConfig } from "./config.js";
 import { JobKoreaClient } from "./jobkorea-client.js";
 import { JobKoreaMcpServer } from "./server.js";
@@ -10,11 +10,12 @@ import { JobKoreaMcpServer } from "./server.js";
 export async function start(): Promise<void> {
   const config = loadJobKoreaConfig(process.env);
   const client = new JobKoreaClient(config);
-  const server = await createMcpServer(JobKoreaMcpServer, {
-    resolve: () => Object.assign(new JobKoreaMcpServer(), { client }),
-  });
 
-  await startStdioServer(server);
+  serveStdioServer(() =>
+    createMcpServer(JobKoreaMcpServer, {
+      resolve: () => Object.assign(new JobKoreaMcpServer(), { client }),
+    }),
+  );
 }
 
 const entrypoint = process.argv[1] ? resolve(process.argv[1]) : undefined;

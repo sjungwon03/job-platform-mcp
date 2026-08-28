@@ -1,6 +1,5 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createMcpServer } from "@theorvane/type-mcp";
+import { createMcpTestSession } from "@theorvane/type-mcp/testing";
 import { describe, expect, it, vi } from "vitest";
 import { SaraminMcpServer } from "../src/server.js";
 
@@ -10,19 +9,14 @@ describe("SaraminMcpServer", () => {
     instance.client = {
       get: vi.fn(async () => ({ jobs: { job: [] } })),
     } as never;
-    const server = await createMcpServer(SaraminMcpServer, {
-      resolve: () => instance,
-    });
-    const [clientTransport, serverTransport] =
-      InMemoryTransport.createLinkedPair();
-    const client = new Client({ name: "test-client", version: "1.0.0" });
+    const session = await createMcpTestSession(
+      createMcpServer(SaraminMcpServer, {
+        resolve: () => instance,
+      }),
+      { client: { name: "test-client", version: "1.0.0" } },
+    );
 
-    await Promise.all([
-      server.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
-
-    const tools = (await client.listTools()).tools;
+    const tools = (await session.client.listTools()).tools;
     expect(tools).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "saramin_get_search_options" }),
@@ -47,21 +41,23 @@ describe("SaraminMcpServer", () => {
       },
     });
     await expect(
-      client.callTool({ name: "saramin_get_search_options", arguments: {} }),
+      session.client.callTool({
+        name: "saramin_get_search_options",
+        arguments: {},
+      }),
     ).resolves.toMatchObject({
       content: [
         { type: "text", text: expect.stringContaining("전문연구요원") },
       ],
     });
     await expect(
-      client.callTool({
+      session.client.callTool({
         name: "saramin_search_jobs",
         arguments: { count: 111 },
       }),
     ).resolves.toMatchObject({ isError: true });
     expect(instance.client.get).not.toHaveBeenCalled();
 
-    await client.close();
-    await server.close();
+    await session.close();
   });
 });

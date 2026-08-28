@@ -1,6 +1,6 @@
 # wanted-mcp
 
-[Wanted OpenAPI](https://openapi.wanted.jobs/)를 MCP 도구로 제공하기 위한 TypeScript 프로젝트입니다. [TypeMCP](https://www.npmjs.com/package/@theorvane/type-mcp) 데코레이터를 사용하며, 로컬 MCP 호스트가 stdio 프로세스로 실행하는 구조입니다.
+[Wanted OpenAPI](https://openapi.wanted.jobs/)를 MCP 도구로 제공하기 위한 TypeScript 프로젝트입니다. [TypeMCP 0.4.0](https://www.npmjs.com/package/@theorvane/type-mcp) 데코레이터와 분리형 MCP SDK v2 런타임을 사용하며, 로컬 MCP 호스트가 2025·2026 프로토콜을 협상하는 stdio 프로세스로 실행합니다.
 
 현재 초기 버전에는 Wanted OpenAPI V2의 GET /jobs와 검색 옵션 안내를 제공하는 다음 도구가 포함되어 있습니다.
 
