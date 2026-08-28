@@ -8,9 +8,9 @@ Wanted, 사람인, 잡코리아 채용 API를 각각 독립된 MCP 서버로 제
 
 | 패키지 | 플랫폼 | MCP 도구 | 인증 방식 |
 | --- | --- | --- | --- |
-| [wanted-mcp](packages/wanted-mcp/README.md) | Wanted OpenAPI | wanted_list_jobs | 사용자 Client ID와 Client Secret |
-| [saramin-mcp](packages/saramin-mcp/README.md) | 사람인 채용정보 API | saramin_search_jobs, saramin_get_job | 사용자 access-key |
-| [jobkorea-mcp](packages/jobkorea-mcp/README.md) | 잡코리아 채용정보 API | jobkorea_fetch_jobs, jobkorea_fetch_entry_jobs | 승인 후 발급된 사용자별 호출 URL |
+| [wanted-mcp](packages/wanted-mcp/README.md) | Wanted OpenAPI | wanted_get_search_options, wanted_list_jobs | 사용자 Client ID와 Client Secret |
+| [saramin-mcp](packages/saramin-mcp/README.md) | 사람인 채용정보 API | saramin_get_search_options, saramin_search_jobs, saramin_get_job | 사용자 access-key |
+| [jobkorea-mcp](packages/jobkorea-mcp/README.md) | 잡코리아 채용정보 API | jobkorea_get_search_options, jobkorea_fetch_jobs, jobkorea_fetch_entry_jobs | 승인 후 발급된 사용자별 호출 URL |
 
 [job-match-search](skills/job-match-search/SKILL.md) 스킬은 다음 작업을 수행합니다.
 
@@ -196,9 +196,12 @@ pnpm build
 설정한 플랫폼만 등록해도 됩니다. MCP 호스트를 다시 시작한 다음 도구 목록에서 다음 이름을 확인합니다.
 
 ~~~text
+wanted_get_search_options
 wanted_list_jobs
+saramin_get_search_options
 saramin_search_jobs
 saramin_get_job
+jobkorea_get_search_options
 jobkorea_fetch_jobs
 jobkorea_fetch_entry_jobs
 ~~~

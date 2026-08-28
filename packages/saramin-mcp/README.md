@@ -6,10 +6,36 @@
 
 | 도구 | 설명 |
 | --- | --- |
+| saramin_get_search_options | 고용형태·학력·정렬 코드, 날짜·페이지 규칙과 공식 코드표 링크 조회 |
 | saramin_search_jobs | 키워드, 지역, 업종, 직무, 고용형태, 학력, 날짜 조건으로 채용공고 검색 |
 | saramin_get_job | 사람인 공고 번호로 채용공고 조회 |
 
 공식 채용 공고 API의 0 기반 페이지, 최대 110개 결과, 정렬 코드와 다중 코드 검색을 지원합니다.
+
+## 채용 검색 상세 옵션
+
+| 입력 | 허용값·형식 | 설명 |
+| --- | --- | --- |
+| keywords | 문자열 | 기업명·공고명·업직종·직무내용 검색 |
+| bbs_gb | `1` | 공채속보만 조회 |
+| stock | `kospi`, `kosdaq`, `konex` 배열 | 유가증권·코스닥·코넥스 |
+| sr | `directhire` | 헤드헌팅·파견 공고 제외 |
+| loc_cd / loc_mcd / loc_bcd | 코드 배열 | 지역 코드 |
+| ind_cd | 코드 배열 | 산업·업종 코드 |
+| job_mid_cd / job_cd | 코드 배열 | 상위 직무·직무 코드 |
+| job_type | `1`~`22` 코드 배열 | 고용형태 |
+| edu_lv | `0`~`9` 코드 배열 | 학력 |
+| fields | posting-date, expiration-date, keyword-code, count | 추가 응답 필드 |
+| published / updated | YYYY-MM-DD | 등록·수정일 조건 |
+| published_min·max / updated_min·max | YYYY-MM-DD HH:mm:ss 또는 Unix timestamp | 등록·수정일시 범위 |
+| deadline | today, tomorrow, YYYY-MM-DD HH:mm:ss 또는 Unix timestamp | 마감 조건 |
+| start | 0 이상 정수, 기본 0 | 0 기반 페이지 번호 |
+| count | 1~110, 기본 10 | 페이지당 결과 수 |
+| sort | pd, pa, ud, ua, da, dd, rc, ac | 정렬 코드 |
+
+고용형태 1~22와 학력 0~9의 전체 한글 의미는 MCP의 `saramin_get_search_options` 결과에 포함됩니다. 정렬은 `pd` 등록 최신(기본), `pa` 등록 오래된, `ud` 수정 최신, `ua` 수정 오래된, `da` 마감 임박, `dd` 마감 먼 순, `rc` 조회수, `ac` 지원자 수 순입니다.
+
+큰 코드 목록은 사람인의 [지역 코드표](https://oapi.saramin.co.kr/guide/code-table2), [산업·업종 코드표](https://oapi.saramin.co.kr/guide/code-table3), [직무·직업 코드표](https://oapi.saramin.co.kr/guide/code-table5)를 사용합니다. 같은 파라미터의 여러 검색어와 서로 다른 파라미터는 AND로 결합되며 와일드카드와 OR 검색은 지원하지 않습니다.
 
 ## 인증 원칙
 

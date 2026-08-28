@@ -22,10 +22,34 @@ describe("WantedMcpServer", () => {
       client.connect(clientTransport),
     ]);
 
-    await expect(client.listTools()).resolves.toMatchObject({
-      tools: expect.arrayContaining([
+    const tools = (await client.listTools()).tools;
+    expect(tools).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "wanted_get_search_options" }),
         expect.objectContaining({ name: "wanted_list_jobs" }),
       ]),
+    );
+    expect(tools.find(({ name }) => name === "wanted_list_jobs")).toMatchObject(
+      {
+        description: expect.stringContaining("wanted_get_search_options"),
+        inputSchema: {
+          properties: {
+            skill_tags: { maxItems: 5 },
+            years: { maxItems: 2 },
+            sort: {
+              default: "job.latest_order",
+              description: expect.stringContaining("기업 응답률순"),
+            },
+          },
+        },
+      },
+    );
+    await expect(
+      client.callTool({ name: "wanted_get_search_options", arguments: {} }),
+    ).resolves.toMatchObject({
+      content: [
+        { type: "text", text: expect.stringContaining("job.latest_order") },
+      ],
     });
     await expect(
       client.callTool({
