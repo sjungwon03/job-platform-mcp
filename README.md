@@ -324,6 +324,10 @@ $job-match-search
 
 ## 개발 명령
 
+기여 절차는 [CONTRIBUTING.md](CONTRIBUTING.md), 코딩 에이전트의 저장소 지침은 [AGENTS.md](AGENTS.md)를 참고합니다. 모든 비긴급 변경은 Issue → 이슈 브랜치 → 검증 → 커밋 → Pull Request → 리뷰 → 병합 순서로 진행합니다.
+
+main 브랜치에 직접 커밋하거나 푸시하지 않습니다.
+
 전체 workspace:
 
 ~~~bash
