@@ -1,6 +1,6 @@
 # jobkorea-mcp
 
-[잡코리아 채용정보 API](https://www.jobkorea.co.kr/service/api)를 MCP 도구로 제공하는 독립 TypeMCP 패키지입니다.
+[잡코리아 채용정보 API](https://www.jobkorea.co.kr/service/api)를 MCP 도구로 제공하는 독립 TypeMCP 0.4.0 패키지입니다. 분리형 MCP SDK v2 stdio 런타임으로 2025·2026 프로토콜을 협상합니다.
 
 ## 전제 조건
 

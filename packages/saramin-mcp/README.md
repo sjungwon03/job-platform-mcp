@@ -1,6 +1,6 @@
 # saramin-mcp
 
-[사람인 채용정보 API](https://oapi.saramin.co.kr/)를 MCP 도구로 제공하는 독립 TypeScript 프로젝트입니다. TypeMCP 데코레이터와 stdio 전송을 사용하며, 다른 MCP 서버와 별도 프로세스로 실행됩니다.
+[사람인 채용정보 API](https://oapi.saramin.co.kr/)를 MCP 도구로 제공하는 독립 TypeScript 프로젝트입니다. TypeMCP 0.4.0 데코레이터와 분리형 MCP SDK v2 stdio 전송을 사용하며, 2025·2026 프로토콜을 협상하는 별도 프로세스로 실행됩니다.
 
 ## 제공 도구
 
