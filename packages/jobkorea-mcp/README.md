@@ -6,6 +6,8 @@
 
 잡코리아 API는 공개 공통 엔드포인트나 공용 API 키 방식이 아닙니다. 이용 신청과 내부 승인 후 요청 IP가 등록되고 고유 호출 링크와 가이드가 발급됩니다. 공공기관과 학교가 우선 제공 대상이며 기업·개인은 내부 검토 결과에 따라 제공되지 않을 수 있습니다.
 
+승인 거절이나 기능 부족을 웹 크롤링으로 대체하지 않습니다. 승인된 기관·서비스·서버 IP·이용목적과 발급 가이드 범위에서만 사용하며, 자세한 검토는 루트의 [COMPLIANCE.md](../../COMPLIANCE.md)를 확인하세요.
+
 발급받은 URL은 인증정보로 취급합니다.
 
 - 저장소나 로그에 URL을 남기지 않습니다.
@@ -55,6 +57,7 @@ MCP 호스트 설정 예시:
       "command": "node",
       "args": ["/absolute/path/to/packages/jobkorea-mcp/dist/index.js"],
       "env": {
+        "JOBKOREA_API_USE_APPROVED": "true",
         "JOBKOREA_JOBS_API_URL": "your-issued-call-url",
         "JOBKOREA_ENTRY_API_URL": "your-issued-entry-call-url"
       }
@@ -67,6 +70,7 @@ MCP 호스트 설정 예시:
 
 | 환경변수 | 필수 | 설명 |
 | --- | --- | --- |
+| JOBKOREA_API_USE_APPROVED | 예 | 승인된 기관·서비스·서버 IP·이용목적임을 운영자가 확인하는 안전 게이트 |
 | JOBKOREA_JOBS_API_URL | 조건부 | 발급받은 일반 채용정보 고유 호출 링크 |
 | JOBKOREA_ENTRY_API_URL | 조건부 | 발급받은 신입공채 고유 호출 링크 |
 | JOBKOREA_REQUEST_TIMEOUT_MS | 아니요 | 요청 제한 시간, 기본 10000ms |

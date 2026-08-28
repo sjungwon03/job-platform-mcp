@@ -22,6 +22,12 @@ function required(env: NodeJS.ProcessEnv, name: string): string {
 export function loadWantedConfig(
   env: NodeJS.ProcessEnv,
 ): Readonly<WantedConfig> {
+  if (env.WANTED_API_USE_APPROVED?.trim().toLowerCase() !== "true") {
+    throw new WantedConfigError(
+      "Set WANTED_API_USE_APPROVED=true only after Wanted approved this service and use purpose",
+    );
+  }
+
   const rawBaseUrl = env.WANTED_API_BASE_URL?.trim() || DEFAULT_BASE_URL;
   let baseUrl: URL;
 

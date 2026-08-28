@@ -40,6 +40,12 @@ function issuedUrl(
 export function loadJobKoreaConfig(
   env: NodeJS.ProcessEnv,
 ): Readonly<JobKoreaConfig> {
+  if (env.JOBKOREA_API_USE_APPROVED?.trim().toLowerCase() !== "true") {
+    throw new JobKoreaConfigError(
+      "Set JOBKOREA_API_USE_APPROVED=true only after JobKorea approved the institution, service, server IP, and use purpose",
+    );
+  }
+
   const jobsApiUrl = issuedUrl(
     env.JOBKOREA_JOBS_API_URL,
     "JOBKOREA_JOBS_API_URL",

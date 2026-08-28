@@ -12,6 +12,12 @@ export interface SaraminConfig {
 export function loadSaraminConfig(
   env: NodeJS.ProcessEnv,
 ): Readonly<SaraminConfig> {
+  if (env.SARAMIN_API_USE_APPROVED?.trim().toLowerCase() !== "true") {
+    throw new SaraminConfigError(
+      "Set SARAMIN_API_USE_APPROVED=true only after Saramin approved this service and its charging model complies with the API restrictions",
+    );
+  }
+
   const accessKey = env.SARAMIN_ACCESS_KEY?.trim();
   if (!accessKey) {
     throw new SaraminConfigError(
