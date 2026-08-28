@@ -14,7 +14,7 @@ Wanted, 사람인, 잡코리아 채용 API를 각각 독립된 MCP 서버로 제
 | 사람인 | 회사명/학교명, 부서명/전공명, 서비스 URL과 목적을 제출하고 승인 | API 서비스 재판매·이용요금 부과 금지. 상업용은 별도 서면 허가 필요 |
 | 잡코리아 | 공공기관·학교 우선. 기관·서비스·서버 IP와 목적 심사 후 고유 URL 발급 | 개인·일반 기업은 승인되지 않을 수 있음 |
 
-승인되지 않은 API는 등록하지 않으며 비공개 API나 접근 제한 우회로 대체하지 않습니다. 승인 가능한 API가 없다면 개인·비상업용에 한해 사용자가 보는 브라우저에서 사람인·잡코리아 단일 검색을 열거나, 사용자가 직접 제공한 공고 텍스트와 파일을 비교할 수 있습니다.
+승인되지 않은 API는 등록하지 않으며 비공개 API나 접근 제한 우회로 대체하지 않습니다. 승인 가능한 API가 없다면 개인·비상업용에 한해 사용자가 보는 브라우저에서 Wanted·사람인·잡코리아 단일 검색을 열거나, 사용자가 직접 제공한 공고 텍스트와 파일을 비교할 수 있습니다.
 
 개인용 브라우저 모드는 백그라운드 크롤러가 아닙니다. 검색당 현재 화면의 최대 20건만 요약하고, 추가 페이지는 사용자 요청이 있을 때 한 페이지만 이동하며, 원문·HTML·쿠키를 저장하지 않습니다.
 
@@ -35,7 +35,7 @@ Wanted, 사람인, 잡코리아 채용 API를 각각 독립된 MCP 서버로 제
 - 연결된 Wanted, 사람인, 잡코리아 MCP를 함께 조회
 - 중복 공고 제거와 근거 기반 적합도 평가
 - 상위 공고의 일치 근거, 부족한 요건과 원문 링크 제공
-- 승인된 API가 없는 개인 사용자를 위한 화면 표시형 사람인·잡코리아 검색
+- 승인된 API가 없는 개인 사용자를 위한 화면 표시형 Wanted·사람인·잡코리아 검색
 - 브라우저 현재 화면의 제한된 결과를 이력서 프로필과 비교
 
 ## 설계 원칙
@@ -360,20 +360,20 @@ $job-match-search
 
 ~~~text
 $job-match-search
-개인적인 구직 용도야. 사람인과 잡코리아를 브라우저로 열어서
+개인적인 구직 용도야. Wanted, 사람인, 잡코리아를 브라우저로 열어서
 서울 백엔드 Java 공고를 찾아줘. 현재 화면의 결과만 비교해줘.
 ~~~
 
 에이전트에 브라우저 자동화 기능이 없으면 저장소 루트에서 URL을 생성할 수 있습니다.
 
 ~~~bash
-node skills/job-match-search/scripts/browser-search.mjs --provider saramin,jobkorea --query "백엔드 Java 서울"
+node skills/job-match-search/scripts/browser-search.mjs --provider wanted,saramin,jobkorea --query "백엔드 Java 서울"
 ~~~
 
 사용자가 개인·비상업용 책임 고지를 확인하고 실제 브라우저 열기를 요청한 경우에만 --open과 --acknowledge-personal-use를 함께 추가합니다.
 
 ~~~bash
-node skills/job-match-search/scripts/browser-search.mjs --provider saramin,jobkorea --query "백엔드 Java 서울" --open --acknowledge-personal-use
+node skills/job-match-search/scripts/browser-search.mjs --provider wanted,saramin,jobkorea --query "백엔드 Java 서울" --open --acknowledge-personal-use
 ~~~
 
 스크립트는 사용자의 기본 브라우저에 공식 검색 URL을 열 뿐, 페이지 HTML이나 로그인 정보를 읽지 않습니다. 결과를 분석하려면 사용 중인 에이전트에 화면 읽기 가능한 브라우저 기능이 있어야 합니다.

@@ -6,6 +6,11 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PROVIDERS = {
+  wanted: {
+    baseUrl: "https://www.wanted.co.kr/search",
+    queryParameter: "query",
+    fixedParameters: { tab: "position" },
+  },
   saramin: {
     baseUrl: "https://www.saramin.co.kr/zf_user/search",
     queryParameter: "searchword",
@@ -48,6 +53,11 @@ export function buildBrowserSearchUrl(provider, query) {
   }
 
   const url = new URL(definition.baseUrl);
+  for (const [name, value] of Object.entries(
+    definition.fixedParameters ?? {},
+  )) {
+    url.searchParams.set(name, value);
+  }
   url.searchParams.set(definition.queryParameter, normalizeSearchQuery(query));
   return url.toString();
 }
@@ -144,7 +154,7 @@ function parseArguments(argv) {
 
 function printHelp() {
   process.stdout.write(
-    "Usage: node browser-search.mjs --query <text> [--provider saramin,jobkorea] [--open --acknowledge-personal-use]\n",
+    "Usage: node browser-search.mjs --query <text> [--provider wanted,saramin,jobkorea] [--open --acknowledge-personal-use]\n",
   );
 }
 

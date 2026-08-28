@@ -21,9 +21,15 @@ test("rejects empty and oversized queries", () => {
   assert.throws(() => normalizeSearchQuery("a".repeat(201)), /200 characters/);
 });
 
-test("builds Saramin and JobKorea public browser search URLs", () => {
+test("builds Wanted, Saramin and JobKorea public browser search URLs", () => {
+  const wanted = new URL(buildBrowserSearchUrl("wanted", "백엔드 서울"));
   const saramin = new URL(buildBrowserSearchUrl("saramin", "백엔드 서울"));
   const jobkorea = new URL(buildBrowserSearchUrl("jobkorea", "백엔드 서울"));
+
+  assert.equal(wanted.origin, "https://www.wanted.co.kr");
+  assert.equal(wanted.pathname, "/search");
+  assert.equal(wanted.searchParams.get("query"), "백엔드 서울");
+  assert.equal(wanted.searchParams.get("tab"), "position");
 
   assert.equal(saramin.origin, "https://www.saramin.co.kr");
   assert.equal(saramin.pathname, "/zf_user/search");

@@ -1,6 +1,6 @@
 # 개인용 브라우저 검색
 
-이 모드는 공식 API가 연결되지 않은 개인 사용자가 자신의 화면에 표시되는 사람인·잡코리아 검색 결과를 탐색하도록 돕는다. 법적 제한을 우회하는 기능이나 크롤링 허가가 아니며, 브라우저를 사용한다는 사실만으로 자동화가 비자동화로 바뀌지 않는다.
+이 모드는 공식 API가 연결되지 않은 개인 사용자가 자신의 화면에 표시되는 Wanted·사람인·잡코리아 검색 결과를 탐색하도록 돕는다. 법적 제한을 우회하는 기능이나 크롤링 허가가 아니며, 브라우저를 사용한다는 사실만으로 자동화가 비자동화로 바뀌지 않는다.
 
 ## 사용 조건
 
@@ -35,7 +35,7 @@
 
 ~~~bash
 node skills/job-match-search/scripts/browser-search.mjs \
-  --provider saramin,jobkorea \
+  --provider wanted,saramin,jobkorea \
   --query "백엔드 Java 서울"
 ~~~
 
@@ -43,7 +43,7 @@ URL만 출력하는 것이 기본값이다. 사용자가 책임 고지를 받아
 
 ~~~bash
 node skills/job-match-search/scripts/browser-search.mjs \
-  --provider saramin,jobkorea \
+  --provider wanted,saramin,jobkorea \
   --query "백엔드 Java 서울" \
   --open --acknowledge-personal-use
 ~~~
@@ -75,6 +75,7 @@ node skills/job-match-search/scripts/browser-search.mjs \
 ## 판단 근거
 
 - 저작권법 제30조는 비영리 개인 이용을 위한 복제를 정하지만, 반복적·체계적 데이터베이스 복제와 약관·접근 제한 문제는 별도로 판단될 수 있다.
+- Wanted 개인회원 약관은 회사의 사전 허락 없는 자동화 수단을 통한 게시물 수집을 제한한다. Wanted 자체 검색 에이전트의 제공은 제3자 자동화 허락을 의미하지 않는다.
 - 저작권법 제93조는 데이터베이스의 상당 부분 및 통상 이용과 충돌하는 반복적·체계적 복제를 보호 대상으로 정한다.
 - RFC 9309는 브라우저를 콘텐츠를 표시하는 클라이언트로, crawler를 자동화된 클라이언트로 구분하며 robots.txt가 접근 권한 자체는 아니라고 명시한다.
 - 사람인 개인회원 약관은 서비스를 통해 얻은 정보의 무단 복사·복제·사용을 제한한다.
@@ -83,6 +84,7 @@ node skills/job-match-search/scripts/browser-search.mjs \
 공식 링크:
 
 - https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025202705
+- https://www.wanted.co.kr/terms
 - https://www.law.go.kr/LSW/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025203419
 - https://www.rfc-editor.org/rfc/rfc9309.html
 - https://www.saramin.co.kr/zf_user/help/terms-of-service?nomo=1
