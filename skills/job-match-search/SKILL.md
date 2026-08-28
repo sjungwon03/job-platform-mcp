@@ -1,6 +1,6 @@
 ---
 name: job-match-search
-description: Analyze a user's resume, CV, career history, or portfolio, guide first-time job-board credential setup, and search available MCP tools for matching roles. Use for personalized 채용공고 검색, initial job MCP setup, job recommendations, role matching, or fit-gap comparisons.
+description: Analyze a user's resume, CV, career history, or portfolio and find matching roles through approved job MCPs or user-visible personal browser searches. Use for personalized 채용공고 검색, initial job MCP setup, job recommendations, role matching, or fit-gap comparisons.
 ---
 
 # Job Match Search
@@ -21,7 +21,7 @@ description: Analyze a user's resume, CV, career history, or portfolio, guide fi
 
 이미 정상 호출되는 플랫폼에는 매번 인증을 다시 묻지 않는다. 일부 플랫폼을 건너뛰거나 아직 발급받지 못했어도 연결된 플랫폼만으로 계속 검색할 수 있다.
 
-공식 API가 하나도 승인되지 않았다면 사용자가 제공한 공고 파일·텍스트·링크를 비교할 수 있다고 안내한다. 링크를 읽는 기능이 없는 에이전트에서는 본문이나 파일을 요청한다. 여러 페이지를 자동 순회하거나 검색 결과를 대량 수집하는 크롤러를 실행·제안·구현하지 않는다.
+공식 API가 하나도 승인되지 않았다면 사용자가 제공한 공고 파일·텍스트·링크 또는 개인용 브라우저 검색 모드를 선택할 수 있다고 안내한다. 개인용 브라우저 검색은 개인·비상업용 확인과 책임 고지 수락 후에만 사용하며 [개인용 브라우저 검색](references/browser-search.md)을 읽는다. 링크를 읽는 기능이 없는 에이전트에서는 본문이나 파일을 요청한다.
 
 ## 입력 취급
 
@@ -58,9 +58,21 @@ description: Analyze a user's resume, CV, career history, or portfolio, guide fi
 
 나이, 성별, 사진, 혼인 여부, 출신지, 장애, 종교 등 보호되거나 직무와 무관한 특성은 검색과 순위에 사용하지 않는다.
 
+## 검색 경로 선택
+
+다음 순서로 현재 요청에 사용할 경로를 정한다.
+
+1. 현재 용도에 승인된 공식 MCP가 있으면 해당 MCP를 우선한다.
+2. 승인된 MCP가 없고 사용자가 자신의 구직을 위한 개인·비상업용 검색이라고 확인하면 [개인용 브라우저 검색](references/browser-search.md)을 읽고 사용자 화면에 표시되는 브라우저 검색을 사용할 수 있다.
+3. 브라우저 검색은 API 승인이나 법률상 허가를 우회하는 수단으로 설명하지 않는다. 시작 전에 책임 고지를 간단히 알리고 사용자가 받아들이는지 확인한다.
+4. 상업용, 재판매, 팀 공유, 데이터셋 구축, 예약 모니터링 또는 대량 수집 요청에는 브라우저 검색 모드를 사용하지 않는다.
+5. 어느 경로도 사용할 수 없으면 사용자가 제공한 개별 공고만 비교한다.
+
+현재 대화에서 이미 개인·비상업용 목적과 책임 고지 수락을 분명히 확인했다면 같은 검색 흐름에서 반복해 묻지 않는다.
+
 ## 검색
 
-1. [MCP routing](references/mcp-routing.md)을 읽고 현재 사용 가능한 채용 MCP를 식별한다.
+1. 공식 API 경로를 선택했다면 [MCP routing](references/mcp-routing.md)을 읽고 현재 사용 가능한 채용 MCP를 식별한다. 브라우저 경로를 선택했다면 browser-search.md의 실행·중단 조건을 따른다.
 2. 핵심 직무명과 동의어, 대표 기술을 조합해 넓은 검색을 먼저 수행한다. 이력서 문장 전체를 검색어로 쓰지 않는다.
 3. 지역·경력·고용 형태 같은 확실한 필터만 적용한다. 플랫폼 코드를 모르면 코드 값을 발명하지 말고 키워드 검색이나 무필터 조회를 사용한다.
 4. 한 플랫폼의 실패가 다른 플랫폼 검색을 막지 않게 한다. 실패한 출처와 이유를 결과에 짧게 밝힌다.
@@ -95,4 +107,6 @@ description: Analyze a user's resume, CV, career history, or portfolio, guide fi
 
 이 스킬은 검색과 비교를 수행한다. 사용자 요청 없이 지원서를 제출하거나 계정을 만들거나 담당자에게 연락하거나 결제하지 않는다. 사용자가 지원을 요청해도 제출 직전에는 대상 공고와 전송 내용을 보여주고 별도 확인을 받는다.
 
-이 스킬은 플랫폼의 접근 제한, robots.txt, CAPTCHA, 로그인, IP 차단 또는 호출 제한을 우회하지 않는다. 플랫폼의 서면 허가 없이 웹 크롤링을 공식 API의 대체 수단으로 사용하지 않는다.
+이 스킬은 플랫폼의 접근 제한, robots.txt, CAPTCHA, 로그인, IP 차단 또는 호출 제한을 우회하지 않는다. 개인용 브라우저 검색은 사용자 요청으로 공식 검색 화면을 열고 현재 표시된 소량의 결과를 읽는 모드이며, 숨겨진 API 호출·HTML 대량 수집·페이지 자동 순회로 확장하지 않는다.
+
+이 프로젝트와 스킬은 법률 자문이나 플랫폼 이용허락을 제공하지 않는다. 관련 법령이 허용하는 최대 범위에서 제작자와 기여자는 사용자의 실행 방식과 그 결과에 책임을 부담하지 않지만, 이 고지가 법률상 배제할 수 없는 책임까지 면제하는 것은 아니다.
