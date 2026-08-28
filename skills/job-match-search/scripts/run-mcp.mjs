@@ -9,6 +9,7 @@ import {
   loadCredentialStore,
   PLATFORM_KEYS,
 } from "./credential-store.mjs";
+import { assertApprovedUse } from "./provider-policy.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(scriptDirectory, "../../..");
@@ -36,6 +37,7 @@ async function main() {
   }
 
   const inherited = { ...process.env };
+  assertApprovedUse(platform, inherited);
   const credentials = await loadCredentialStore(getStorePath());
   const childEnvironment = { ...inherited };
 

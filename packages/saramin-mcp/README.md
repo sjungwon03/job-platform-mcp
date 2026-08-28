@@ -41,6 +41,8 @@
 
 이 서버는 공용 access-key를 제공하거나 사람인 API 사용 권한을 대신 관리하지 않습니다. 각 사용자가 [사람인 API 이용 신청](https://oapi.saramin.co.kr/) 후 발급받은 키를 자신의 MCP 호스트 환경에 설정합니다.
 
+신청에는 회사명/학교명, 부서명/전공명, 서비스 URL과 이용목적이 필요합니다. 사람인의 [서비스 이용자 주의사항](https://oapi.saramin.co.kr/caution)은 API 기반 서비스의 재판매와 이용요금 부과를 금지합니다. 유료·상업 서비스는 사람인의 별도 서면 허가가 확인되지 않으면 이 서버를 사용하지 마세요. 자세한 검토는 루트의 [COMPLIANCE.md](../../COMPLIANCE.md)를 확인하세요.
+
 - access-key는 사람인 API 요청 쿼리에만 추가합니다.
 - 키를 로그나 MCP 응답에 포함하지 않습니다.
 - 사용량 제한 초과 등 사람인 오류는 키를 제외한 안전한 오류로 반환합니다.
@@ -64,6 +66,7 @@ MCP 호스트 설정 예시:
       "command": "node",
       "args": ["/absolute/path/to/packages/saramin-mcp/dist/index.js"],
       "env": {
+        "SARAMIN_API_USE_APPROVED": "true",
         "SARAMIN_ACCESS_KEY": "your-access-key"
       }
     }
@@ -75,6 +78,7 @@ MCP 호스트 설정 예시:
 
 | 환경변수 | 필수 | 기본값 | 설명 |
 | --- | --- | --- | --- |
+| SARAMIN_API_USE_APPROVED | 예 | - | 승인된 서비스·용도이며 과금 제한을 준수함을 운영자가 확인하는 안전 게이트 |
 | SARAMIN_ACCESS_KEY | 예 | - | 사용자 소유 사람인 API access-key |
 | SARAMIN_API_BASE_URL | 아니요 | https://oapi.saramin.co.kr | API 베이스 URL |
 | SARAMIN_REQUEST_TIMEOUT_MS | 아니요 | 10000 | 요청 제한 시간(ms) |

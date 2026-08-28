@@ -32,6 +32,8 @@
 
 이 프로젝트는 Wanted API 사용료를 대신 결제하거나 공용 인증키를 제공하지 않습니다. 각 사용자가 Wanted에 직접 인증키를 신청하고, 본인 계정에 부여된 무료·유료 API 권한을 사용합니다.
 
+신청서에는 사업자등록번호, 회사명과 서비스 URL이 필수입니다. 키가 발급되었더라도 승인된 서비스·이용목적·권한 범위에서만 사용해야 합니다. 자세한 검토는 루트의 [COMPLIANCE.md](../../COMPLIANCE.md)를 확인하세요.
+
 - 인증정보는 MCP 호스트가 실행 환경변수로 주입합니다.
 - wanted-client-id, wanted-client-secret, 선택적 Authorization 헤더는 Wanted API에만 전달합니다.
 - 인증정보를 파일에 저장하거나 로그 및 MCP 응답에 포함하지 않습니다.
@@ -55,9 +57,10 @@ pnpm --filter wanted-mcp build
 export WANTED_CLIENT_ID="your-client-id"
 export WANTED_CLIENT_SECRET="your-client-secret"
 export WANTED_AUTHORIZATION="Bearer your-permission-token"
+export WANTED_API_USE_APPROVED="true"
 ~~~
 
-WANTED_AUTHORIZATION은 Wanted에서 별도 권한 토큰을 발급한 사용자만 설정하면 됩니다.
+WANTED_AUTHORIZATION은 Wanted에서 별도 권한 토큰을 발급한 사용자만 설정하면 됩니다. WANTED_API_USE_APPROVED는 현재 서비스와 용도에 대한 실제 승인을 확인한 경우에만 true로 설정합니다.
 
 빌드된 stdio 서버를 직접 실행하려면:
 
@@ -74,6 +77,7 @@ stdio 서버는 터미널에서 화면을 제공하지 않습니다. 아래처�
       "command": "node",
       "args": ["/absolute/path/to/packages/wanted-mcp/dist/index.js"],
       "env": {
+        "WANTED_API_USE_APPROVED": "true",
         "WANTED_CLIENT_ID": "your-client-id",
         "WANTED_CLIENT_SECRET": "your-client-secret",
         "WANTED_AUTHORIZATION": "Bearer your-permission-token"
@@ -113,6 +117,7 @@ test/                  # 설정, 클라이언트, 도구 입력 테스트
 
 | 환경변수 | 필수 | 기본값 | 설명 |
 | --- | --- | --- | --- |
+| WANTED_API_USE_APPROVED | 예 | - | 현재 서비스·이용목적이 승인됐음을 운영자가 확인하는 안전 게이트 |
 | WANTED_CLIENT_ID | 예 | - | 사용자가 발급받은 Client ID |
 | WANTED_CLIENT_SECRET | 예 | - | 사용자가 발급받은 Client Secret |
 | WANTED_AUTHORIZATION | 아니요 | - | 권한형·유료 기능용으로 발급된 Authorization 값 |

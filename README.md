@@ -4,6 +4,18 @@ Wanted, 사람인, 잡코리아 채용 API를 각각 독립된 MCP 서버로 제
 
 이 문서는 사람이 직접 설정할 때와 Codex, Claude Code, OpenCode, OpenClaw 같은 에이전트가 대신 설정할 때 모두 사용할 수 있는 기준 문서입니다.
 
+> **먼저 확인하세요:** 이 프로젝트는 공개 웹 크롤러가 아닙니다. 세 플랫폼 모두 공식 승인 범위가 있으며, 개인이 바로 발급받을 수 있다고 보장되지 않습니다. 인증정보를 입력하기 전에 아래 자격 표와 [데이터 공급자 이용 정책](COMPLIANCE.md)을 확인하세요.
+
+## 연결 자격 요약
+
+| 플랫폼 | 신청 전제 | 과금·배포 주의사항 |
+| --- | --- | --- |
+| Wanted | 사업자등록번호, 회사명, 서비스 URL이 필수이며 권한별 심사 | 승인된 서비스·권한·계약 범위에서만 사용 |
+| 사람인 | 회사명/학교명, 부서명/전공명, 서비스 URL과 목적을 제출하고 승인 | API 서비스 재판매·이용요금 부과 금지. 상업용은 별도 서면 허가 필요 |
+| 잡코리아 | 공공기관·학교 우선. 기관·서비스·서버 IP와 목적 심사 후 고유 URL 발급 | 개인·일반 기업은 승인되지 않을 수 있음 |
+
+승인되지 않은 플랫폼은 등록하지 않으며, 크롤링·비공개 API·접근 제한 우회로 대체하지 않습니다. 승인 가능한 API가 없다면 사용자가 직접 제공한 공고 텍스트나 파일을 스킬로 비교할 수 있습니다.
+
 ## 제공 기능
 
 | 패키지 | 플랫폼 | MCP 도구 | 인증 방식 |
@@ -28,11 +40,12 @@ Wanted, 사람인, 잡코리아 채용 API를 각각 독립된 MCP 서버로 제
 - TypeMCP 0.4.0과 분리형 MCP SDK v2 런타임을 사용합니다.
 - stdio 서버는 factory 방식으로 시작해 MCP 2025·2026 프로토콜을 협상합니다.
 - 플랫폼별 인증정보와 API 클라이언트를 서로 공유하지 않습니다.
-- 각 사용자가 직접 발급받은 API 권한을 사용합니다.
+- 각 사용자가 현재 기관·서비스·용도로 직접 승인받은 API 권한만 사용합니다.
 - 유료 기능은 사용자의 계정에 권한이 있을 때만 호출됩니다.
 - 이력서 원문과 개인정보를 채용 API에 전송하지 않습니다.
 - 검색에 필요한 직무명, 기술, 경력, 지역 같은 최소 파생 조건만 API로 전달합니다.
 - 사용자의 확인 없이 지원서 제출, 계정 생성, 담당자 연락 또는 결제를 수행하지 않습니다.
+- 승인 거절, 기능 부족 또는 할당량 소진을 웹 크롤링으로 우회하지 않습니다.
 
 ## 요구 사항
 
@@ -79,17 +92,22 @@ pnpm verify
 
 원하는 플랫폼만 설정하면 됩니다. 세 플랫폼을 모두 사용할 필요는 없습니다.
 
+인증정보보다 먼저 신청 주체, 서비스 URL, 이용목적과 상업·과금 여부가 플랫폼 승인 범위에 맞는지 확인합니다. 각 서버는 승인 확인 환경변수가 없으면 시작하지 않습니다. 이 값은 승인 증명이 아니라 운영자의 명시적 확인입니다.
+
 #### Wanted
 
 발급: https://openapi.wanted.jobs/apply/
 
 | 환경변수 | 필수 | 설명 |
 | --- | --- | --- |
+| WANTED_API_USE_APPROVED | 예 | 현재 서비스·이용목적이 승인된 경우에만 `true` |
 | WANTED_CLIENT_ID | 예 | 사용자가 발급받은 Client ID |
 | WANTED_CLIENT_SECRET | 예 | 사용자가 발급받은 Client Secret |
 | WANTED_AUTHORIZATION | 아니요 | 별도 권한 또는 유료 기능에 필요한 Authorization 값 |
 
 이 프로젝트는 API 비용을 대신 결제하거나 공용 키를 제공하지 않습니다. 유료 기능을 사용할 경우 해당 MCP 사용자가 자신의 Wanted 계정으로 권한과 결제를 관리합니다.
+
+신청에는 사업자등록번호, 회사명과 서비스 URL이 필요합니다.
 
 #### 사람인
 
@@ -97,7 +115,10 @@ pnpm verify
 
 | 환경변수 | 필수 | 설명 |
 | --- | --- | --- |
+| SARAMIN_API_USE_APPROVED | 예 | 승인된 용도이며 과금 제한을 준수하는 경우에만 `true` |
 | SARAMIN_ACCESS_KEY | 예 | 사용자가 발급받은 access-key |
+
+사람인의 이용자 주의사항은 API를 사용한 서비스의 재판매와 이용요금 부과를 금지합니다. 유료·상업 서비스는 사람인의 별도 서면 허가 없이 연결하지 않습니다.
 
 #### 잡코리아
 
@@ -107,10 +128,13 @@ pnpm verify
 
 | 환경변수 | 필수 | 설명 |
 | --- | --- | --- |
+| JOBKOREA_API_USE_APPROVED | 예 | 기관·서비스·서버 IP·이용목적이 승인된 경우에만 `true` |
 | JOBKOREA_JOBS_API_URL | 조건부 | 일반 채용정보용 발급 URL |
 | JOBKOREA_ENTRY_API_URL | 조건부 | 신입·인턴 공채용 발급 URL |
 
 두 URL 중 하나 이상이 필요합니다. 발급 URL 전체를 비밀정보로 취급해야 합니다.
+
+잡코리아 API는 공공기관·학교가 우선 제공 대상이며 개인·일반 기업은 내부 검토 결과에 따라 발급되지 않을 수 있습니다.
 
 ### 4. 인증정보 안전하게 입력
 
@@ -125,11 +149,12 @@ node skills/job-match-search/scripts/configure-credentials.mjs
 설정기는 다음 순서로 동작합니다.
 
 1. 설정할 플랫폼을 선택합니다.
-2. 인증값을 별표로 마스킹해 입력받습니다.
-3. 기본적으로 사용자 설정 디렉터리 아래 job-platform-mcp/credentials.json에 저장합니다.
-4. Linux, macOS, WSL에서는 파일 권한을 0600으로 제한합니다.
-5. 저장소 내부 경로, 심볼릭 링크, 다른 사용자가 읽을 수 있는 파일을 거부합니다.
-6. 값은 다시 출력하지 않고 플랫폼별 설정 여부만 보여줍니다.
+2. 플랫폼별 공식 승인 조건을 보여주고 승인 여부를 다시 확인합니다.
+3. 승인된 플랫폼의 인증값만 별표로 마스킹해 입력받습니다.
+4. 기본적으로 사용자 설정 디렉터리 아래 job-platform-mcp/credentials.json에 저장합니다.
+5. Linux, macOS, WSL에서는 파일 권한을 0600으로 제한합니다.
+6. 저장소 내부 경로, 심볼릭 링크, 다른 사용자가 읽을 수 있는 파일을 거부합니다.
+7. 값은 다시 출력하지 않고 플랫폼별 설정 여부만 보여줍니다.
 
 기본 저장 위치:
 
@@ -175,21 +200,30 @@ pnpm build
       "args": [
         "/absolute-path/job-platform-mcp/skills/job-match-search/scripts/run-mcp.mjs",
         "wanted"
-      ]
+      ],
+      "env": {
+        "WANTED_API_USE_APPROVED": "true"
+      }
     },
     "saramin": {
       "command": "node",
       "args": [
         "/absolute-path/job-platform-mcp/skills/job-match-search/scripts/run-mcp.mjs",
         "saramin"
-      ]
+      ],
+      "env": {
+        "SARAMIN_API_USE_APPROVED": "true"
+      }
     },
     "jobkorea": {
       "command": "node",
       "args": [
         "/absolute-path/job-platform-mcp/skills/job-match-search/scripts/run-mcp.mjs",
         "jobkorea"
-      ]
+      ],
+      "env": {
+        "JOBKOREA_API_USE_APPROVED": "true"
+      }
     }
   }
 }
@@ -217,13 +251,15 @@ MCP 호스트가 서버 이름을 접두사로 붙이면 실제 노출 이름은
 1. 현재 디렉터리가 pnpm-workspace.yaml이 있는 저장소 루트인지 확인합니다.
 2. node --version과 pnpm --version으로 요구 버전을 확인합니다.
 3. pnpm install과 pnpm build를 실행합니다.
-4. 사용자가 연결하려는 플랫폼과 인증정보 발급 여부를 묻습니다.
-5. 인증값을 일반 대화창에 입력하도록 요구하지 않습니다.
-6. 대화형 TTY에서 configure-credentials.mjs를 실행하고 사용자가 직접 마스킹 입력하게 합니다.
-7. 사용하는 에이전트 또는 MCP 호스트의 설정 위치를 확인합니다.
-8. 비밀값 없이 run-mcp.mjs의 절대 경로와 플랫폼 인자만 등록합니다.
-9. MCP 호스트를 다시 시작한 뒤 결과 수가 작은 읽기 전용 요청으로 연결을 확인합니다.
-10. 성공 시 연결된 플랫폼 이름만 보고합니다. 오류에도 인증값이나 잡코리아 발급 URL을 포함하지 않습니다.
+4. 개인·기업·학교·공공기관 중 신청 주체와 개인·내부 비상업용 또는 유료·상업용 중 사용 목적을 묻습니다.
+5. 연결하려는 플랫폼이 현재 서비스·용도를 승인했고 인증정보까지 발급했는지 확인합니다.
+6. 승인되지 않은 플랫폼은 등록하지 않고 크롤링으로 대체하지 않습니다.
+7. 인증값을 일반 대화창에 입력하도록 요구하지 않습니다.
+8. 대화형 TTY에서 configure-credentials.mjs를 실행하고 사용자가 직접 승인 여부를 재확인한 뒤 마스킹 입력하게 합니다.
+9. 사용하는 에이전트 또는 MCP 호스트의 설정 위치를 확인합니다.
+10. 비밀값 없이 run-mcp.mjs의 절대 경로, 플랫폼 인자와 승인 확인 환경변수만 등록합니다.
+11. MCP 호스트를 다시 시작한 뒤 결과 수가 작은 읽기 전용 요청으로 연결을 확인합니다.
+12. 성공 시 연결된 플랫폼 이름만 보고합니다. 오류에도 인증값이나 잡코리아 발급 URL을 포함하지 않습니다.
 
 에이전트가 대화형 TTY를 제공하지 못하면 설정 명령만 사용자에게 안내하고 입력이 끝날 때까지 기다립니다. 인증 실패를 자동으로 반복하지 않습니다.
 
@@ -378,6 +414,7 @@ pnpm test:skill
 | --- | --- |
 | Built MCP entry not found | 루트에서 pnpm build를 실행했는지 확인 |
 | Missing required configuration | configure-credentials.mjs --check로 해당 플랫폼 설정 여부 확인 |
+| Set *_API_USE_APPROVED=true | 플랫폼이 현재 기관·서비스·이용목적을 실제 승인했는지 확인한 뒤 해당 승인 확인 환경변수 설정 |
 | Credential store permissions are too broad | Linux, macOS, WSL에서 인증 파일에 chmod 600 적용 |
 | Credential store must be outside the project workspace | 기본 사용자 설정 경로를 사용하거나 저장소 밖의 절대 경로 지정 |
 | Wanted 401 또는 403 | Client ID, Secret, 선택 Authorization과 계정 권한 확인 |
@@ -394,6 +431,7 @@ pnpm test:skill
 - 잡코리아 호출 URL은 URL 전체를 비밀정보로 취급하세요.
 - 인증 저장소 파일을 클라우드 동기화 폴더나 공유 디렉터리에 두지 마세요.
 - 다른 사람이 관리하는 스킬이나 스크립트에 인증 저장소 접근 권한을 주지 마세요.
+- 플랫폼의 서면 허가 없이 채용 사이트나 모바일 내부 API를 자동 수집하지 마세요.
 
 ## 라이선스와 API 이용 조건
 

@@ -7,6 +7,7 @@ import {
   loadCredentialStore,
   saveCredentialStore,
 } from "./credential-store.mjs";
+import { PROVIDER_POLICIES } from "./provider-policy.mjs";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(scriptDirectory, "../../..");
@@ -143,6 +144,25 @@ function parsePlatforms(value) {
   return selected;
 }
 
+async function confirmApprovedUse(platform) {
+  process.stdout.write(
+    "\n" +
+      PLATFORM_NAMES[platform] +
+      " 승인 조건: " +
+      PROVIDER_POLICIES[platform].notice +
+      "\n",
+  );
+  const answer = await readTty(
+    "공식 승인을 받았고 승인된 용도로만 사용합니까? (yes 입력, 그 외 건너뜀): ",
+  );
+  if (answer.trim().toLowerCase() === "yes") return true;
+  process.stdout.write(
+    PLATFORM_NAMES[platform] +
+      " 인증정보 입력을 건너뜁니다. 승인 전에는 크롤링으로 대체하지 마세요.\n",
+  );
+  return false;
+}
+
 function isInsideWorkspace(filePath) {
   const relative = path.relative(workspaceRoot, filePath);
   return (
@@ -181,6 +201,11 @@ async function main() {
   );
 
   if (selected.includes("wanted")) {
+    if (!(await confirmApprovedUse("wanted"))) {
+      selected.splice(selected.indexOf("wanted"), 1);
+    }
+  }
+  if (selected.includes("wanted")) {
     credentials.WANTED_CLIENT_ID = await askCredential(
       "WANTED_CLIENT_ID",
       credentials.WANTED_CLIENT_ID,
@@ -197,12 +222,22 @@ async function main() {
   }
 
   if (selected.includes("saramin")) {
+    if (!(await confirmApprovedUse("saramin"))) {
+      selected.splice(selected.indexOf("saramin"), 1);
+    }
+  }
+  if (selected.includes("saramin")) {
     credentials.SARAMIN_ACCESS_KEY = await askCredential(
       "SARAMIN_ACCESS_KEY",
       credentials.SARAMIN_ACCESS_KEY,
     );
   }
 
+  if (selected.includes("jobkorea")) {
+    if (!(await confirmApprovedUse("jobkorea"))) {
+      selected.splice(selected.indexOf("jobkorea"), 1);
+    }
+  }
   if (selected.includes("jobkorea")) {
     const jobsUrl = await askCredential(
       "JOBKOREA_JOBS_API_URL",

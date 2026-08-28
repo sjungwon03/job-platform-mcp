@@ -4,6 +4,7 @@ import { loadWantedConfig } from "../src/config.js";
 describe("loadWantedConfig", () => {
   it("loads user-owned credentials without exposing defaults for secrets", () => {
     const config = loadWantedConfig({
+      WANTED_API_USE_APPROVED: "true",
       WANTED_CLIENT_ID: "client-id",
       WANTED_CLIENT_SECRET: "client-secret",
       WANTED_AUTHORIZATION: "Bearer paid-feature-token",
@@ -17,6 +18,7 @@ describe("loadWantedConfig", () => {
   it("rejects missing user credentials", () => {
     expect(() =>
       loadWantedConfig({
+        WANTED_API_USE_APPROVED: "true",
         WANTED_CLIENT_ID: "client-id",
       }),
     ).toThrow("WANTED_CLIENT_SECRET");
@@ -25,10 +27,20 @@ describe("loadWantedConfig", () => {
   it("rejects non-HTTPS API origins", () => {
     expect(() =>
       loadWantedConfig({
+        WANTED_API_USE_APPROVED: "true",
         WANTED_CLIENT_ID: "client-id",
         WANTED_CLIENT_SECRET: "client-secret",
         WANTED_API_BASE_URL: "http://openapi.wanted.jobs/v2",
       }),
     ).toThrow("must use HTTPS");
+  });
+
+  it("requires explicit confirmation of approved API use", () => {
+    expect(() =>
+      loadWantedConfig({
+        WANTED_CLIENT_ID: "client-id",
+        WANTED_CLIENT_SECRET: "client-secret",
+      }),
+    ).toThrow("WANTED_API_USE_APPROVED=true");
   });
 });
